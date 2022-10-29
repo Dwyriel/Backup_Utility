@@ -1,10 +1,23 @@
-#include <QApplication>
-#include <QPushButton>
+#include "src/MainWindow/mainwindow.h"
 
-int main(int argc, char *argv[]) {
+#include <QApplication>
+#include <QLocale>
+#include <QTranslator>
+
+int main(int argc, char *argv[])
+{
     QApplication a(argc, argv);
-    QWidget Window = QWidget(nullptr);
-    Window.setFixedSize(450, 200);
-    Window.show();
-    return QApplication::exec();
+
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "Backup_Utility_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            a.installTranslator(&translator);
+            break;
+        }
+    }
+    MainWindow w;
+    w.show();
+    return a.exec();
 }

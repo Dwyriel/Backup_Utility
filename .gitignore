@@ -63,6 +63,7 @@ CMakeCache.txt
 count_primes
 Makefile
 *cmake*/
+*build*/
 
 #IDEs
 .idea/

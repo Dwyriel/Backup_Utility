@@ -18,12 +18,18 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    void connectSignals();
+
 private slots:
-    void backupBtnPressed();
-    void newPresetBtnPressed();
-    void deletePresetBtnPressed();
-    void searchFolderBtnPressed();
-    void filesBtnPressed();
+    void actionMultithreadedToggled(bool checked);
+    void inputBackupFolderEditingFinished();
+    void comboBoxPresetsChanged(int index);
+    void btnNewPresetPressed();
+    void btnDeletePresetPressed();
+    void btnSearchFolderPressed();
+    void btnFilesPressed();
+    void btnBackupPressed();
+    void checkBoxAllPresets(int state);
 };
 
 #endif // MAINWINDOW_H

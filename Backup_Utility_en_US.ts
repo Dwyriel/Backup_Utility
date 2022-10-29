@@ -4,11 +4,15 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/MainWindow/mainwindow.ui" line="35"/>
-        <location filename="build-Backup_Utility-Desktop-Debug/Backup_Utility_autogen/include/ui_mainwindow.h" line="177"/>
         <location filename="build-Backup_Utility-Desktop-MinSizeRel/Backup_Utility_autogen/include/ui_mainwindow.h" line="177"/>
         <location filename="build-Backup_Utility-Desktop-Release/Backup_Utility_autogen/include/ui_mainwindow.h" line="177"/>
         <source>MainWindow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/MainWindow/mainwindow.ui" line="35"/>
+        <location filename="build-Backup_Utility-Desktop-Debug/Backup_Utility_autogen/include/ui_mainwindow.h" line="177"/>
+        <source>Backup Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

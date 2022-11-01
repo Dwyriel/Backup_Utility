@@ -39,7 +39,26 @@ void MainWindow::btnNewPresetPressed(){}
 
 void MainWindow::btnDeletePresetPressed(){}
 
-void MainWindow::btnSearchFolderPressed(){}
+void MainWindow::btnSearchFolderPressed(){
+    QString folder = QFileDialog::getExistingDirectory(this, MainWindow::tr("Open Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(folder == "")
+        return;
+    QFileInfo fileInfo(folder);
+    if(!fileInfo.isDir()){//Shouldn't be needed, still verifying to make sure
+        Utility::showError(this, tr("Error"), tr("Needs to be a directory"));
+        return;
+    }
+    if(fileInfo.isRoot()){
+        Utility::showError(this, tr("Error"), tr("Backup Folder can't be the root directory") + " \"" + QDir::root().absolutePath() + "\"");
+        return;
+    }
+    if(!fileInfo.isWritable()){
+        Utility::showError(this, tr("Error"), tr("Program does not have permission to write to that directory"));
+        return;
+    }
+    ui->inputBackupFolder->setText(folder);
+    //TODO config stuff
+}
 
 void MainWindow::btnFilesPressed(){}
 

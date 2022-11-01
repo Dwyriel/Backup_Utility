@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
         src/MainWindow/mainwindow.ui
         src/presetandconfig.cpp
         src/presetandconfig.h
+        src/utility.h
+        src/utility.cpp
         ${TS_FILES}
 )
 

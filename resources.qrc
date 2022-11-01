@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/resources">
         <file>icon/icon.ico</file>
+        <file>icon/dialog-error.ico</file>
+        <file>icon/dialog-warning.ico</file>
     </qresource>
 </RCC>

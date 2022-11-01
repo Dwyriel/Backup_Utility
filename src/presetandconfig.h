@@ -5,18 +5,16 @@
 #include <QList>
 #include <QDir>
 
-class Preset
+struct Preset
 {
-public:
     QString PresetName;
     unsigned long BackupNumber = 1;
     QList<QString> FilesToSave;
     QList<QString> FoldersToSave;
 };
 
-class PresetsAndConfig
+struct PresetsAndConfig
 {
-public:
     bool Multithreaded = true;
     QString BackupFolderPath;
     int CurrentPresetIndex = 0;

@@ -11,9 +11,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+#add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F06) Would still work, but I perfer to just ignore Qt5 completely
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 
 set(TS_FILES Backup_Utility_en_US.ts)

@@ -156,7 +156,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="inputBackupFolder">
+   <widget class="CustomLineEdit" name="inputBackupFolder">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -320,6 +320,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>src/CustomLineEdit/customlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

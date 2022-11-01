@@ -18,7 +18,7 @@ MainWindow::~MainWindow()
 void MainWindow::connectSignals(){
     connect(ui->actionQuit, &QAction::triggered, &QApplication::quit);
     connect(ui->actionMultithreaded, &QAction::toggled, this, &MainWindow::actionMultithreadedToggled);
-    connect(ui->inputBackupFolder, &QLineEdit::editingFinished, this, &MainWindow::inputBackupFolderEditingFinished);
+    connect(ui->inputBackupFolder, &CustomLineEdit::lostFocus, this, &MainWindow::inputBackupFolderLostFocus);
     connect(ui->comboBoxPresets, &QComboBox::currentIndexChanged, this, &MainWindow::comboBoxPresetsChanged);//pre Qt6: static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged) or QOverload<int>(&QComboBox::currentIndexChanged)
     connect(ui->btnNewPreset, &QPushButton::pressed, this, &MainWindow::btnNewPresetPressed);
     connect(ui->BtnDeletePreset, &QPushButton::pressed, this, &MainWindow::btnDeletePresetPressed);
@@ -31,7 +31,32 @@ void MainWindow::connectSignals(){
 
 void MainWindow::actionMultithreadedToggled(bool checked){}
 
-void MainWindow::inputBackupFolderEditingFinished(){}
+void MainWindow::inputBackupFolderLostFocus(){
+    QString inputtedFolder = ui->inputBackupFolder->text();
+    if(inputtedFolder == "")
+        return;
+    QFileInfo fileInfo(inputtedFolder);
+    if(!fileInfo.exists()){
+        Utility::showError(this, tr("Error"), tr("Inserted directory does not exists"));
+        ui->inputBackupFolder->setFocus();
+        return;
+    }
+    if(!fileInfo.isDir()){
+        Utility::showError(this, tr("Error"), tr("Needs to be a directory"));
+        ui->inputBackupFolder->setFocus();
+        return;
+    }
+    if(fileInfo.isRoot()){
+        Utility::showError(this, tr("Error"), tr("Backup Folder can't be the root directory") + " \"" + QDir::root().absolutePath() + "\"");
+        ui->inputBackupFolder->setFocus();
+        return;
+    }
+    if(!fileInfo.isWritable()){
+        Utility::showError(this, tr("Error"), tr("Program does not have permission to write to that directory"));
+        ui->inputBackupFolder->setFocus();
+        return;
+    }
+}
 
 void MainWindow::comboBoxPresetsChanged(int index){}
 

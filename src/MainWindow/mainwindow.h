@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+
 #include <src/utility.h>
+#include <src/CustomLineEdit/customlineedit.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,7 +26,7 @@ private:
 
 private slots:
     void actionMultithreadedToggled(bool checked);
-    void inputBackupFolderEditingFinished();
+    void inputBackupFolderLostFocus();
     void comboBoxPresetsChanged(int index);
     void btnNewPresetPressed();
     void btnDeletePresetPressed();

@@ -28,6 +28,8 @@ set(PROJECT_SOURCES
         src/presetandconfig.h
         src/utility.h
         src/utility.cpp
+        src/CustomLineEdit/customlineedit.h
+        src/CustomLineEdit/customlineedit.cpp
         ${TS_FILES}
 )
 

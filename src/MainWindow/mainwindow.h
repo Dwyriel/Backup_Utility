@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
-#include <QDebug>
 
 #include <src/CustomLineEdit/customlineedit.h>
 #include <src/presetandconfig.h>
@@ -24,12 +23,15 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    void setWidgetVisibility();
+
     void setWidgetValues();
 
     void connectSignals();
 
 private slots:
     void actionMultithreadedToggled(bool checked);
+    void actionAllPresetsToggled(bool checked);
     void inputBackupFolderLostFocus();
     void comboBoxPresetsChanged(int index);
     void btnNewPresetPressed();
@@ -37,7 +39,7 @@ private slots:
     void btnSearchFolderPressed();
     void btnFilesPressed();
     void btnBackupPressed();
-    void checkBoxAllPresets(int state);
+    void checkBoxAllPresetsStateChanged(int state);
 };
 
 #endif // MAINWINDOW_H

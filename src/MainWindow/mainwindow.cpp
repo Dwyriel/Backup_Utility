@@ -8,19 +8,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     PresetManager::Initialize();
+    setWidgetVisibility();
     setWidgetValues();
-    //TODO set widget values from config file
     connectSignals();
-    qDebug() << ui->menubar->isNativeMenuBar();
 }
 
 MainWindow::~MainWindow()
 {
+    PresetManager::Save();
     delete ui;
+}
+
+void MainWindow::setWidgetVisibility(){
+    ui->actionAll_presets->setVisible(!ui->menubar->isNativeMenuBar());
+    ui->checkBoxAllPresets->setVisible(ui->menubar->isNativeMenuBar());
 }
 
 void MainWindow::setWidgetValues(){
     ui->actionMultithreaded->setChecked(PresetManager::presetsAndConfig.Multithreaded);
+    ui->actionAll_presets->setChecked(PresetManager::presetsAndConfig.backupAllPresets);
     ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
     ui->checkBoxAllPresets->setChecked(PresetManager::presetsAndConfig.backupAllPresets);
     for(const auto &item : PresetManager::presetsAndConfig.Presets)
@@ -31,6 +37,7 @@ void MainWindow::setWidgetValues(){
 void MainWindow::connectSignals(){
     connect(ui->actionQuit, &QAction::triggered, &QApplication::quit);
     connect(ui->actionMultithreaded, &QAction::toggled, this, &MainWindow::actionMultithreadedToggled);
+    connect(ui->actionAll_presets, &QAction::toggled, this, &MainWindow::actionAllPresetsToggled);
     connect(ui->inputBackupFolder, &CustomLineEdit::lostFocus, this, &MainWindow::inputBackupFolderLostFocus);
     connect(ui->comboBoxPresets, &QComboBox::currentIndexChanged, this, &MainWindow::comboBoxPresetsChanged);//pre Qt6: static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged) or QOverload<int>(&QComboBox::currentIndexChanged)
     connect(ui->btnNewPreset, &QPushButton::pressed, this, &MainWindow::btnNewPresetPressed);
@@ -39,11 +46,16 @@ void MainWindow::connectSignals(){
     connect(ui->btnFiles, &QPushButton::pressed, this, &MainWindow::btnFilesPressed);
     connect(ui->btnBackup, &QPushButton::pressed, this, &MainWindow::btnBackupPressed);
     connect(ui->btnBackup, &QPushButton::pressed, this, &MainWindow::btnBackupPressed);
-    connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresets);
+    connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresetsStateChanged);
 }
 
 void MainWindow::actionMultithreadedToggled(bool checked){
     PresetManager::presetsAndConfig.Multithreaded = checked;
+    PresetManager::Save();
+}
+
+void MainWindow::actionAllPresetsToggled(bool checked){
+    PresetManager::presetsAndConfig.backupAllPresets = checked;
     PresetManager::Save();
 }
 
@@ -120,7 +132,7 @@ void MainWindow::btnFilesPressed(){}
 
 void MainWindow::btnBackupPressed(){}
 
-void MainWindow::checkBoxAllPresets(int state){
+void MainWindow::checkBoxAllPresetsStateChanged(int state){
     PresetManager::presetsAndConfig.backupAllPresets = state;
     PresetManager::Save();
 }

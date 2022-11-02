@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>485</width>
-    <height>300</height>
+    <height>235</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="maximumSize">
    <size>
     <width>485</width>
-    <height>300</height>
+    <height>235</height>
    </size>
   </property>
   <property name="cursor">
@@ -298,6 +298,7 @@
      <string>Options</string>
     </property>
     <addaction name="actionMultithreaded"/>
+    <addaction name="actionAll_presets"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuOptions"/>
@@ -317,6 +318,17 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionAll_presets">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>All presets</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

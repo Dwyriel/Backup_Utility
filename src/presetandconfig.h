@@ -56,7 +56,11 @@ public:
 
     static void Save();
 
+    static void Save(int index);
+
     static void CheckFilesIntegrity();
+
+    static int RemovePresetAt(int index);
 
     static bool CheckIfFileNameIsValid(QString name);
 

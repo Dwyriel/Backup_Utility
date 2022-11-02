@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
     delete ui;
 }
 
@@ -29,9 +29,11 @@ void MainWindow::setWidgetValues(){
     ui->actionAll_presets->setChecked(PresetManager::presetsAndConfig.BackupAllPresets);
     ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
     ui->checkBoxAllPresets->setChecked(PresetManager::presetsAndConfig.BackupAllPresets);
+    ui->comboBoxPresets->clear();
     for(const auto &item : PresetManager::presetsAndConfig.Presets)
         ui->comboBoxPresets->addItem(item.PresetName);
-    ui->comboBoxPresets->setCurrentIndex(PresetManager::presetsAndConfig.CurrentPresetIndex);
+    ui->comboBoxPresets->setCurrentIndex(ui->comboBoxPresets->count() > 0 ? PresetManager::presetsAndConfig.CurrentPresetIndex : -1);
+    setWidgetEnabled();
 }
 
 void MainWindow::connectSignals(){
@@ -39,24 +41,36 @@ void MainWindow::connectSignals(){
     connect(ui->actionMultithreaded, &QAction::toggled, this, &MainWindow::actionMultithreadedToggled);
     connect(ui->actionAll_presets, &QAction::toggled, this, &MainWindow::actionAllPresetsToggled);
     connect(ui->inputBackupFolder, &CustomLineEdit::lostFocus, this, &MainWindow::inputBackupFolderLostFocus);
-    connect(ui->comboBoxPresets, &QComboBox::currentIndexChanged, this, &MainWindow::comboBoxPresetsChanged);//pre Qt6: static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged) or QOverload<int>(&QComboBox::currentIndexChanged)
     connect(ui->btnNewPreset, &QPushButton::pressed, this, &MainWindow::btnNewPresetPressed);
     connect(ui->BtnDeletePreset, &QPushButton::pressed, this, &MainWindow::btnDeletePresetPressed);
     connect(ui->btnSearch, &QPushButton::pressed, this, &MainWindow::btnSearchFolderPressed);
     connect(ui->btnFiles, &QPushButton::pressed, this, &MainWindow::btnFilesPressed);
     connect(ui->btnBackup, &QPushButton::pressed, this, &MainWindow::btnBackupPressed);
-    connect(ui->btnBackup, &QPushButton::pressed, this, &MainWindow::btnBackupPressed);
     connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresetsStateChanged);
+}
+
+void MainWindow::setWidgetEnabled(){
+    ui->actionQuit->setDisabled(isBackupInProgress);
+    ui->actionMultithreaded->setDisabled(isBackupInProgress);
+    ui->actionAll_presets->setDisabled(isBackupInProgress);
+    ui->inputBackupFolder->setDisabled(isBackupInProgress);
+    ui->comboBoxPresets->setDisabled(isBackupInProgress);
+    ui->btnNewPreset->setDisabled(isBackupInProgress);
+    ui->BtnDeletePreset->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
+    ui->btnSearch->setDisabled(isBackupInProgress);
+    ui->btnFiles->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
+    ui->btnBackup->setDisabled(isBackupInProgress);
+    ui->checkBoxAllPresets->setDisabled(isBackupInProgress);
 }
 
 void MainWindow::actionMultithreadedToggled(bool checked){
     PresetManager::presetsAndConfig.Multithreaded = checked;
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
 void MainWindow::actionAllPresetsToggled(bool checked){
     PresetManager::presetsAndConfig.BackupAllPresets = checked;
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
 void MainWindow::inputBackupFolderLostFocus(){
@@ -90,17 +104,19 @@ void MainWindow::inputBackupFolderLostFocus(){
     }
     ui->inputBackupFolder->setText(inputtedFolder);
     PresetManager::presetsAndConfig.BackupFolderPath = inputtedFolder;
-    PresetManager::Save();
-}
-
-void MainWindow::comboBoxPresetsChanged(int index){
-    PresetManager::presetsAndConfig.CurrentPresetIndex = index;
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
 void MainWindow::btnNewPresetPressed(){}
 
-void MainWindow::btnDeletePresetPressed(){}
+void MainWindow::btnDeletePresetPressed(){
+    auto result = Utility::showWarningWithButtons(nullptr, QObject::tr("Confirm"), QObject::tr("Are you sure you want to delete this preset?"));
+    if(result != QMessageBox::Yes)
+        return;
+    PresetManager::RemovePresetAt(ui->comboBoxPresets->currentIndex());
+    setWidgetValues();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
+}
 
 void MainWindow::btnSearchFolderPressed(){
     QString folder = QFileDialog::getExistingDirectory(this, MainWindow::tr("Open Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -125,14 +141,14 @@ void MainWindow::btnSearchFolderPressed(){
     }
     ui->inputBackupFolder->setText(folder);
     PresetManager::presetsAndConfig.BackupFolderPath = folder;
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
-void MainWindow::btnFilesPressed(){}
+void MainWindow::btnFilesPressed(){}//use index from combobox
 
-void MainWindow::btnBackupPressed(){}
+void MainWindow::btnBackupPressed(){}//use index from combobox
 
 void MainWindow::checkBoxAllPresetsStateChanged(int state){
     PresetManager::presetsAndConfig.BackupAllPresets = state;
-    PresetManager::Save();
+    PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }

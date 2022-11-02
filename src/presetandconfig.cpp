@@ -109,18 +109,32 @@ void PresetManager::Save(){
     file.close();
 }
 
+void PresetManager::Save(int index){
+    presetsAndConfig.CurrentPresetIndex = index;
+    Save();
+}
+
 void PresetManager::CheckFilesIntegrity(){
     bool configChanged = false;
     if(presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()){
         presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
         configChanged = true;
     }
-    if(presetsAndConfig.Presets.size() < 0){
+    if(presetsAndConfig.CurrentPresetIndex < 0){
         presetsAndConfig.CurrentPresetIndex = 0;
         configChanged = true;
     }
     if(configChanged)
         Save();
+}
+
+int PresetManager::RemovePresetAt(int index){
+    if(presetsAndConfig.Presets.length() < 1)
+        return -1;
+    presetsAndConfig.CurrentPresetIndex = index;
+    presetsAndConfig.Presets.removeAt(presetsAndConfig.CurrentPresetIndex);
+    presetsAndConfig.CurrentPresetIndex = (presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.length()) ? (presetsAndConfig.Presets.length() - 1) : presetsAndConfig.CurrentPresetIndex;
+    return presetsAndConfig.CurrentPresetIndex;
 }
 
 bool PresetManager::CheckIfFileNameIsValid(QString name){

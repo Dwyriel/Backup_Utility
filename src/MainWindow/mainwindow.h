@@ -22,6 +22,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    bool isBackupInProgress = false;
 
     void setWidgetVisibility();
 
@@ -29,11 +30,12 @@ private:
 
     void connectSignals();
 
+    void setWidgetEnabled();
+
 private slots:
     void actionMultithreadedToggled(bool checked);
     void actionAllPresetsToggled(bool checked);
     void inputBackupFolderLostFocus();
-    void comboBoxPresetsChanged(int index);
     void btnNewPresetPressed();
     void btnDeletePresetPressed();
     void btnSearchFolderPressed();

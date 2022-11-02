@@ -29,7 +29,7 @@ struct Preset
 struct PresetsAndConfig
 {
     bool Multithreaded = true;
-    bool backupAllPresets = false;
+    bool BackupAllPresets = false;
     QString BackupFolderPath;
     int CurrentPresetIndex = 0;
     QList<Preset> Presets;

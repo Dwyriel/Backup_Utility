@@ -26,9 +26,9 @@ void MainWindow::setWidgetVisibility(){
 
 void MainWindow::setWidgetValues(){
     ui->actionMultithreaded->setChecked(PresetManager::presetsAndConfig.Multithreaded);
-    ui->actionAll_presets->setChecked(PresetManager::presetsAndConfig.backupAllPresets);
+    ui->actionAll_presets->setChecked(PresetManager::presetsAndConfig.BackupAllPresets);
     ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
-    ui->checkBoxAllPresets->setChecked(PresetManager::presetsAndConfig.backupAllPresets);
+    ui->checkBoxAllPresets->setChecked(PresetManager::presetsAndConfig.BackupAllPresets);
     for(const auto &item : PresetManager::presetsAndConfig.Presets)
         ui->comboBoxPresets->addItem(item.PresetName);
     ui->comboBoxPresets->setCurrentIndex(PresetManager::presetsAndConfig.CurrentPresetIndex);
@@ -55,7 +55,7 @@ void MainWindow::actionMultithreadedToggled(bool checked){
 }
 
 void MainWindow::actionAllPresetsToggled(bool checked){
-    PresetManager::presetsAndConfig.backupAllPresets = checked;
+    PresetManager::presetsAndConfig.BackupAllPresets = checked;
     PresetManager::Save();
 }
 
@@ -133,6 +133,6 @@ void MainWindow::btnFilesPressed(){}
 void MainWindow::btnBackupPressed(){}
 
 void MainWindow::checkBoxAllPresetsStateChanged(int state){
-    PresetManager::presetsAndConfig.backupAllPresets = state;
+    PresetManager::presetsAndConfig.BackupAllPresets = state;
     PresetManager::Save();
 }

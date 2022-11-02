@@ -48,7 +48,7 @@ void PresetManager::Load(){
     if(doc.isObject())
         jsonObj = doc.object();
     presetsAndConfig.Multithreaded = jsonObj.take("Multithreaded").toBool();
-    presetsAndConfig.backupAllPresets = jsonObj.take("backupAllPresets").toBool();
+    presetsAndConfig.BackupAllPresets = jsonObj.take("BackupAllPresets").toBool();
     presetsAndConfig.BackupFolderPath = jsonObj.take("BackupFolderPath").toString();
     presetsAndConfig.CurrentPresetIndex = jsonObj.take("CurrentPresetIndex").toInt();
     auto arrValue = jsonObj.take("Presets").toArray();
@@ -82,7 +82,7 @@ void PresetManager::Save(){
         return;
     QJsonObject pacJsonObj;
     pacJsonObj.insert("Multithreaded", presetsAndConfig.Multithreaded);
-    pacJsonObj.insert("backupAllPresets", presetsAndConfig.backupAllPresets);
+    pacJsonObj.insert("BackupAllPresets", presetsAndConfig.BackupAllPresets);
     pacJsonObj.insert("BackupFolderPath", presetsAndConfig.BackupFolderPath);
     pacJsonObj.insert("CurrentPresetIndex", presetsAndConfig.CurrentPresetIndex);
     QJsonArray presetsJsonArr;

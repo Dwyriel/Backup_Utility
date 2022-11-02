@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
+    PresetManager::Initialize();
+    //TODO set widget values from config file
     connectSignals();
 }
 
@@ -32,30 +34,33 @@ void MainWindow::connectSignals(){
 void MainWindow::actionMultithreadedToggled(bool checked){}
 
 void MainWindow::inputBackupFolderLostFocus(){
-    QString inputtedFolder = ui->inputBackupFolder->text();
+    QString inputtedFolder = ui->inputBackupFolder->text().trimmed();
     if(inputtedFolder == "")
         return;
     QFileInfo fileInfo(inputtedFolder);
     if(!fileInfo.exists()){
         Utility::showError(this, tr("Error"), tr("Inserted directory does not exists"));
-        ui->inputBackupFolder->setFocus();
+        ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
         return;
     }
     if(!fileInfo.isDir()){
         Utility::showError(this, tr("Error"), tr("Needs to be a directory"));
-        ui->inputBackupFolder->setFocus();
+        ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
         return;
     }
     if(fileInfo.isRoot()){
         Utility::showError(this, tr("Error"), tr("Backup Folder can't be the root directory") + " \"" + QDir::root().absolutePath() + "\"");
-        ui->inputBackupFolder->setFocus();
+        ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
         return;
     }
     if(!fileInfo.isWritable()){
-        Utility::showError(this, tr("Error"), tr("Program does not have permission to write to that directory"));
-        ui->inputBackupFolder->setFocus();
+        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory"));
+        ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
         return;
     }
+    ui->inputBackupFolder->setText(inputtedFolder);
+    PresetManager::presetsAndConfig.BackupFolderPath = inputtedFolder;
+    PresetManager::Save();
 }
 
 void MainWindow::comboBoxPresetsChanged(int index){}
@@ -78,11 +83,16 @@ void MainWindow::btnSearchFolderPressed(){
         return;
     }
     if(!fileInfo.isWritable()){
-        Utility::showError(this, tr("Error"), tr("Program does not have permission to write to that directory"));
+        #ifdef Q_OS_WIN
+        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory, run the program as administrator or pick a different directory"));
+        #else
+        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory, run the program as root or pick a different directory"));
+        #endif
         return;
     }
     ui->inputBackupFolder->setText(folder);
-    //TODO config stuff
+    PresetManager::presetsAndConfig.BackupFolderPath = folder;
+    PresetManager::Save();
 }
 
 void MainWindow::btnFilesPressed(){}

@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <QFileDialog>
 
-#include <src/utility.h>
 #include <src/CustomLineEdit/customlineedit.h>
+#include <src/presetandconfig.h>
+#include <src/utility.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

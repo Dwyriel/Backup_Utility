@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QDebug>
 
 #include <src/CustomLineEdit/customlineedit.h>
 #include <src/presetandconfig.h>

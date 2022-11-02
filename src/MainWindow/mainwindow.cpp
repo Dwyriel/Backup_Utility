@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWidgetValues();
     //TODO set widget values from config file
     connectSignals();
+    qDebug() << ui->menubar->isNativeMenuBar();
 }
 
 MainWindow::~MainWindow()

@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     PresetManager::Initialize();
+    setWidgetValues();
     //TODO set widget values from config file
     connectSignals();
 }
@@ -15,6 +16,15 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setWidgetValues(){
+    ui->actionMultithreaded->setChecked(PresetManager::presetsAndConfig.Multithreaded);
+    ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
+    ui->checkBoxAllPresets->setChecked(PresetManager::presetsAndConfig.backupAllPresets);
+    for(const auto &item : PresetManager::presetsAndConfig.Presets)
+        ui->comboBoxPresets->addItem(item.PresetName);
+    ui->comboBoxPresets->setCurrentIndex(PresetManager::presetsAndConfig.CurrentPresetIndex);
 }
 
 void MainWindow::connectSignals(){
@@ -31,7 +41,10 @@ void MainWindow::connectSignals(){
     connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresets);
 }
 
-void MainWindow::actionMultithreadedToggled(bool checked){}
+void MainWindow::actionMultithreadedToggled(bool checked){
+    PresetManager::presetsAndConfig.Multithreaded = checked;
+    PresetManager::Save();
+}
 
 void MainWindow::inputBackupFolderLostFocus(){
     QString inputtedFolder = ui->inputBackupFolder->text().trimmed();
@@ -54,7 +67,11 @@ void MainWindow::inputBackupFolderLostFocus(){
         return;
     }
     if(!fileInfo.isWritable()){
-        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory"));
+        #ifdef Q_OS_WIN
+        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory, run the program as administrator or pick a different directory"));
+        #else
+        Utility::showWarning(this, tr("Warning"), tr("Program does not have permission to write to that directory, run the program as root or pick a different directory"));
+        #endif
         ui->inputBackupFolder->setText(PresetManager::presetsAndConfig.BackupFolderPath);
         return;
     }
@@ -63,7 +80,10 @@ void MainWindow::inputBackupFolderLostFocus(){
     PresetManager::Save();
 }
 
-void MainWindow::comboBoxPresetsChanged(int index){}
+void MainWindow::comboBoxPresetsChanged(int index){
+    PresetManager::presetsAndConfig.CurrentPresetIndex = index;
+    PresetManager::Save();
+}
 
 void MainWindow::btnNewPresetPressed(){}
 
@@ -99,4 +119,7 @@ void MainWindow::btnFilesPressed(){}
 
 void MainWindow::btnBackupPressed(){}
 
-void MainWindow::checkBoxAllPresets(int state){}
+void MainWindow::checkBoxAllPresets(int state){
+    PresetManager::presetsAndConfig.backupAllPresets = state;
+    PresetManager::Save();
+}

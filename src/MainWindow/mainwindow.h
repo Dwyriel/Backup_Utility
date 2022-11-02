@@ -23,6 +23,8 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    void setWidgetValues();
+
     void connectSignals();
 
 private slots:

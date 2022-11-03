@@ -30,6 +30,9 @@ set(PROJECT_SOURCES
         src/utility.cpp
         src/CustomLineEdit/customlineedit.h
         src/CustomLineEdit/customlineedit.cpp
+        src/InputDialog/inputdialog.h
+        src/InputDialog/inputdialog.cpp
+        src/InputDialog/inputdialog.ui
         ${TS_FILES}
 )
 

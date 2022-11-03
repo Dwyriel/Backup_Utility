@@ -107,7 +107,10 @@ void MainWindow::inputBackupFolderLostFocus(){
     PresetManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
-void MainWindow::btnNewPresetPressed(){}
+void MainWindow::btnNewPresetPressed(){
+    InputDialog dialog(this);
+    dialog.exec();
+}
 
 void MainWindow::btnDeletePresetPressed(){
     auto result = Utility::showWarningWithButtons(nullptr, QObject::tr("Confirm"), QObject::tr("Are you sure you want to delete this preset?"));

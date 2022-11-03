@@ -5,6 +5,7 @@
 #include <QFileDialog>
 
 #include <src/CustomLineEdit/customlineedit.h>
+#include <src/InputDialog/inputdialog.h>
 #include <src/presetandconfig.h>
 #include <src/utility.h>
 

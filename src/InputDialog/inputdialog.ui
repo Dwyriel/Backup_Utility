@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="inputText">
    <property name="geometry">
     <rect>
      <x>15</x>
@@ -28,7 +28,7 @@
     </font>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="lblTitle">
    <property name="geometry">
     <rect>
      <x>15</x>
@@ -43,13 +43,13 @@
     </font>
    </property>
    <property name="text">
-    <string>New preset name:</string>
+    <string>Enter text:</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="btnOk">
    <property name="geometry">
     <rect>
      <x>70</x>
@@ -67,7 +67,7 @@
     <string>Ok</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="btnCancel">
    <property name="geometry">
     <rect>
      <x>170</x>

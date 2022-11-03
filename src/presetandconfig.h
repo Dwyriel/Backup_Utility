@@ -23,6 +23,8 @@ struct Preset
 
     Preset();
 
+    Preset(QString presetName);
+
     Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave);
 };
 
@@ -39,14 +41,14 @@ struct PresetsAndConfig
     PresetsAndConfig(bool multithreaded, QString backupFolderPath, int CurrentPresetIndex, QList<Preset> presets);
 };
 
-class PresetManager
+class ConfigManager
 {
 public:
     static PresetsAndConfig presetsAndConfig;
 
-    PresetManager() = delete;
+    ConfigManager() = delete;
 
-    ~PresetManager() = delete;
+    ~ConfigManager() = delete;
 
     static void Initialize();
 
@@ -60,9 +62,11 @@ public:
 
     static void CheckFilesIntegrity();
 
+    static void AddNewPreset(QString presetName);
+
     static int RemovePresetAt(int index);
 
-    static bool CheckIfFileNameIsValid(QString name);
+    static bool isFileNameValid(QString name);
 
 private:
     static PresetsAndConfig defaultPresetsAndConfig;

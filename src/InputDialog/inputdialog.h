@@ -13,10 +13,24 @@ class InputDialog : public QDialog
 
 public:
     explicit InputDialog(QWidget *parent = nullptr);
+
+    explicit InputDialog(QString title, QWidget *parent = nullptr);
+
     ~InputDialog();
+
+    QString OutputString;
 
 private:
     Ui::InputDialog *ui;
+
+    QString *outputString;
+
+    void connectSignals();
+
+private slots:
+    void btnOkPressed();
+    void btnCancelPressed();
+    void inputTextEdited(QString text);
 };
 
 #endif // INPUTDIALOG_H

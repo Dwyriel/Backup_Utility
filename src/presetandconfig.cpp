@@ -3,6 +3,8 @@
 /*Preset*/
 Preset::Preset(){}
 
+Preset::Preset(QString presetName) : PresetName(presetName), BackupNumber(1), FilesToSave(QStringList()), FoldersToSave(QStringList()){}
+
 Preset::Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave) : PresetName(presetName), BackupNumber(backupNumber), FilesToSave(filesToSave), FoldersToSave(FoldersToSave){}
 
 /*PresetsAndConfig*/
@@ -10,16 +12,16 @@ PresetsAndConfig::PresetsAndConfig(){}
 
 PresetsAndConfig::PresetsAndConfig(bool multithreaded, QString backupFolderPath, int currentPresetIndex, QList<Preset> presets) : Multithreaded(multithreaded), BackupFolderPath(backupFolderPath), CurrentPresetIndex(currentPresetIndex), Presets(presets){}
 
-/*PresetManager*/
-PresetsAndConfig PresetManager::defaultPresetsAndConfig = PresetsAndConfig(true, "", 0, QList<Preset>());
-QString PresetManager::PresetsAndConfigFileName = "Backup_Utility.data";
-QDir PresetManager::currentDir;
-QFileInfo PresetManager::PresetsAndConfigFile;
-PresetsAndConfig PresetManager::presetsAndConfig;
+/*ConfigManager*/
+PresetsAndConfig ConfigManager::defaultPresetsAndConfig = PresetsAndConfig(true, "", 0, QList<Preset>());
+QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.data";
+QDir ConfigManager::currentDir;
+QFileInfo ConfigManager::PresetsAndConfigFile;
+PresetsAndConfig ConfigManager::presetsAndConfig;
 
-void PresetManager::Initialize(){
+void ConfigManager::Initialize(){
     currentDir = QDir(QCoreApplication::applicationDirPath());
-    PresetsAndConfigFile = QFileInfo(PresetManager::currentDir.absolutePath() + QDir::separator() + PresetManager::PresetsAndConfigFileName);
+    PresetsAndConfigFile = QFileInfo(ConfigManager::currentDir.absolutePath() + QDir::separator() + ConfigManager::PresetsAndConfigFileName);
     if(PresetsAndConfigFile.exists())
         Load();
     else
@@ -27,9 +29,9 @@ void PresetManager::Initialize(){
     CheckFilesIntegrity();
 }
 
-Preset PresetManager::CurrentPreset(){ return Preset(); }//TODO
+Preset ConfigManager::CurrentPreset(){ return Preset(); }//TODO
 
-void PresetManager::Load(){
+void ConfigManager::Load(){
     QFile file(PresetsAndConfigFile.absoluteFilePath());
     if(!file.open(QIODeviceBase::ReadOnly))
         return;
@@ -76,7 +78,7 @@ void PresetManager::Load(){
     }
 }
 
-void PresetManager::Save(){
+void ConfigManager::Save(){
     QFile file(PresetsAndConfigFile.absoluteFilePath());
     if(!file.open(QIODeviceBase::ReadWrite | QIODeviceBase::Truncate | QIODeviceBase::Text))
         return;
@@ -86,16 +88,16 @@ void PresetManager::Save(){
     pacJsonObj.insert("BackupFolderPath", presetsAndConfig.BackupFolderPath);
     pacJsonObj.insert("CurrentPresetIndex", presetsAndConfig.CurrentPresetIndex);
     QJsonArray presetsJsonArr;
-    for(int i = 0; i < presetsAndConfig.Presets.length(); i++){
+    for(int i = 0; i < presetsAndConfig.Presets.size(); i++){
         QJsonObject presetObj;
         presetObj.insert("BackupNumber", presetsAndConfig.Presets[i].BackupNumber);
         presetObj.insert("PresetName", presetsAndConfig.Presets[i].PresetName);
         QJsonArray filesToSaveJsonArr;
-        for(int j = 0; j < presetsAndConfig.Presets[i].FilesToSave.length(); j++)
+        for(int j = 0; j < presetsAndConfig.Presets[i].FilesToSave.size(); j++)
             filesToSaveJsonArr.push_back(presetsAndConfig.Presets[i].FilesToSave[j]);
         presetObj.insert("FilesToSave", filesToSaveJsonArr);
         QJsonArray foldersToSaveJsonArr;
-        for(int j = 0; j < presetsAndConfig.Presets[i].FoldersToSave.length(); j++)
+        for(int j = 0; j < presetsAndConfig.Presets[i].FoldersToSave.size(); j++)
             foldersToSaveJsonArr.push_back(presetsAndConfig.Presets[i].FoldersToSave[j]);
         presetObj.insert("FoldersToSave", foldersToSaveJsonArr);
         presetsJsonArr.insert(i, presetObj);
@@ -109,12 +111,12 @@ void PresetManager::Save(){
     file.close();
 }
 
-void PresetManager::Save(int index){
+void ConfigManager::Save(int index){
     presetsAndConfig.CurrentPresetIndex = index;
     Save();
 }
 
-void PresetManager::CheckFilesIntegrity(){
+void ConfigManager::CheckFilesIntegrity(){
     bool configChanged = false;
     if(presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()){
         presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
@@ -128,16 +130,21 @@ void PresetManager::CheckFilesIntegrity(){
         Save();
 }
 
-int PresetManager::RemovePresetAt(int index){
-    if(presetsAndConfig.Presets.length() < 1)
+void ConfigManager::AddNewPreset(QString presetName){
+    presetsAndConfig.Presets.push_back(Preset(presetName));
+    presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
+}
+
+int ConfigManager::RemovePresetAt(int index){
+    if(presetsAndConfig.Presets.size() < 1)
         return -1;
     presetsAndConfig.CurrentPresetIndex = index;
     presetsAndConfig.Presets.removeAt(presetsAndConfig.CurrentPresetIndex);
-    presetsAndConfig.CurrentPresetIndex = (presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.length()) ? (presetsAndConfig.Presets.length() - 1) : presetsAndConfig.CurrentPresetIndex;
+    presetsAndConfig.CurrentPresetIndex = (presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()) ? (presetsAndConfig.Presets.size() - 1) : presetsAndConfig.CurrentPresetIndex;
     return presetsAndConfig.CurrentPresetIndex;
 }
 
-bool PresetManager::CheckIfFileNameIsValid(QString name){
+bool ConfigManager::isFileNameValid(QString name){
 #ifdef Q_OS_WIN
     return !(name.contains(R"(/)") || name.contains(R"(\)") || name.contains(R"(:)") || name.contains(R"(?)") || name.contains(R"(")") || name.contains(R"(<)") || name.contains(R"(>)") || name.contains(R"(|)") || name.contains(R"(*)"));
 #else

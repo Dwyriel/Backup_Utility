@@ -38,11 +38,11 @@ private slots:
     void actionMultithreadedToggled(bool checked);
     void actionAllPresetsToggled(bool checked);
     void inputBackupFolderLostFocus();
-    void btnNewPresetPressed();
-    void btnDeletePresetPressed();
-    void btnSearchFolderPressed();
-    void btnFilesPressed();
-    void btnBackupPressed();
+    void btnNewPresetClicked();
+    void btnDeletePresetClicked();
+    void btnSearchFolderClicked();
+    void btnFilesClicked();
+    void btnBackupClicked();
     void checkBoxAllPresetsStateChanged(int state);
 };
 

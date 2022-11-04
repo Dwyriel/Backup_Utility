@@ -28,8 +28,8 @@ private:
     void connectSignals();
 
 private slots:
-    void btnOkPressed();
-    void btnCancelPressed();
+    void btnOkClicked();
+    void btnCancelClicked();
     void inputTextEdited(QString text);
 };
 

@@ -33,6 +33,9 @@ set(PROJECT_SOURCES
         src/InputDialog/inputdialog.h
         src/InputDialog/inputdialog.cpp
         src/InputDialog/inputdialog.ui
+        src/FilesDialog/filesdialog.h
+        src/FilesDialog/filesdialog.cpp
+        src/FilesDialog/filesdialog.ui
         ${TS_FILES}
 )
 

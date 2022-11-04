@@ -6,6 +6,7 @@
 
 #include <src/CustomLineEdit/customlineedit.h>
 #include <src/InputDialog/inputdialog.h>
+#include <src/FilesDialog/filesdialog.h>
 #include <src/presetandconfig.h>
 #include <src/utility.h>
 

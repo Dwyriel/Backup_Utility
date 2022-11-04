@@ -1,10 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     ConfigManager::Initialize();
@@ -13,8 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     connectSignals();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
     delete ui;
 }

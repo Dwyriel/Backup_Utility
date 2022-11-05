@@ -17,7 +17,7 @@
 struct Preset
 {
     QString PresetName;
-    qint64 BackupNumber = 1;
+    qint64 BackupNumber = 0;
     QStringList FilesToSave;
     QStringList FoldersToSave;
 
@@ -52,7 +52,7 @@ public:
 
     static void Initialize();
 
-    static Preset CurrentPreset();
+    static Preset& CurrentPreset();
 
     static void Load();
 

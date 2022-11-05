@@ -29,7 +29,9 @@ void ConfigManager::Initialize(){
     CheckFilesIntegrity();
 }
 
-Preset ConfigManager::CurrentPreset(){ return Preset(); }//TODO
+Preset& ConfigManager::CurrentPreset(){
+    return std::ref(presetsAndConfig.Presets[presetsAndConfig.CurrentPresetIndex]);
+}
 
 void ConfigManager::Load(){
     QFile file(PresetsAndConfigFile.absoluteFilePath());

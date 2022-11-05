@@ -158,7 +158,12 @@ void MainWindow::btnSearchFolderClicked(){
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
-void MainWindow::btnFilesClicked(){}//use index from combobox
+void MainWindow::btnFilesClicked(){
+    ConfigManager::presetsAndConfig.CurrentPresetIndex = ui->comboBoxPresets->currentIndex();
+    FilesDialog fileDialog(this);
+    fileDialog.exec();
+    ConfigManager::Save();
+}
 
 void MainWindow::btnBackupClicked(){}//use index from combobox
 

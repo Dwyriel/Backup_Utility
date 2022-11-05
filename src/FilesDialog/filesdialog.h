@@ -2,6 +2,10 @@
 #define FILESDIALOG_H
 
 #include <QDialog>
+#include <QFileDialog>
+
+#include <src/presetandconfig.h>
+#include <src/utility.h>
 
 namespace Ui {
 class FilesDialog;
@@ -17,6 +21,22 @@ public:
 
 private:
     Ui::FilesDialog *ui;
+
+    void setFileList();
+
+    void setFolderList();
+
+    void connectSignals();
+
+private slots:
+    void btnAddFileClicked();
+    void btnAddFolderClicked();
+    void btnClearFileClicked();
+    void btnClearFolderClicked();
+    void btnCloseClicked();
+    void btnRemoveFileClicked();
+    void btnRemoveFolderClicked();
+    void btnResetBackupsClicked();
 };
 
 #endif // FILESDIALOG_H

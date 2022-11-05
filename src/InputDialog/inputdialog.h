@@ -14,7 +14,9 @@ class InputDialog : public QDialog
 public:
     explicit InputDialog(QWidget *parent = nullptr);
 
-    explicit InputDialog(QString title, QWidget *parent = nullptr);
+    explicit InputDialog(QString body, QWidget *parent = nullptr);
+
+    explicit InputDialog(QString title, QString body, QWidget *parent = nullptr);
 
     ~InputDialog();
 

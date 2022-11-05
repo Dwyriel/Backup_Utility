@@ -7,10 +7,18 @@ InputDialog::InputDialog(QWidget *parent) : QDialog(parent), ui(new Ui::InputDia
     connectSignals();
 }
 
-InputDialog::InputDialog(QString title, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog){
+InputDialog::InputDialog(QString body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog){
     ui->setupUi(this);
     ui->btnOk->setDisabled(true);
-    ui->lblTitle->setText(title);
+    ui->lblBody->setText(body);
+    connectSignals();
+}
+
+InputDialog::InputDialog(QString title, QString body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog){
+    ui->setupUi(this);
+    ui->btnOk->setDisabled(true);
+    setWindowTitle(title);
+    ui->lblBody->setText(body);
     connectSignals();
 }
 

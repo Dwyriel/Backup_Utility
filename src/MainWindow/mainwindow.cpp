@@ -104,7 +104,7 @@ void MainWindow::inputBackupFolderLostFocus(){
 }
 
 void MainWindow::btnNewPresetClicked(){
-    InputDialog dialog(tr("New preset name:"), this);
+    InputDialog dialog(tr("New Preset"), tr("New preset name:"), this);
     if(!dialog.exec())
         return;
     if(dialog.OutputString == "")

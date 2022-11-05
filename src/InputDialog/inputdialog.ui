@@ -28,7 +28,7 @@
     </font>
    </property>
   </widget>
-  <widget class="QLabel" name="lblTitle">
+  <widget class="QLabel" name="lblBody">
    <property name="geometry">
     <rect>
      <x>15</x>

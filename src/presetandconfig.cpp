@@ -14,7 +14,7 @@ PresetsAndConfig::PresetsAndConfig(bool multithreaded, QString backupFolderPath,
 
 /*ConfigManager*/
 PresetsAndConfig ConfigManager::defaultPresetsAndConfig = PresetsAndConfig(true, "", 0, QList<Preset>());
-QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.data";
+QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.conf";
 QDir ConfigManager::currentDir;
 QFileInfo ConfigManager::PresetsAndConfigFile;
 PresetsAndConfig ConfigManager::presetsAndConfig;
@@ -128,6 +128,51 @@ void ConfigManager::CheckFilesIntegrity(){
         presetsAndConfig.CurrentPresetIndex = 0;
         configChanged = true;
     }
+    if(presetsAndConfig.Presets.isEmpty()){
+        presetsAndConfig.CurrentPresetIndex = 0;
+        configChanged = true;
+    }
+    if(presetsAndConfig.BackupFolderPath != ""){
+        QFileInfo backupFolder(presetsAndConfig.BackupFolderPath);
+        if(!backupFolder.exists() || !backupFolder.isDir()){
+            presetsAndConfig.BackupFolderPath = "";
+            configChanged = true;
+        }
+    }
+    QList<int> indexOfPresetsWithInvalidName;
+    for(int i = 0; i < presetsAndConfig.Presets.size(); i++){
+        if(!isFileNameValid(presetsAndConfig.Presets[i].PresetName)){
+            indexOfPresetsWithInvalidName.push_back(i);//! Not using push_front as push_back is always constant time
+            continue;
+        }
+        QList<int> indexOfInvalidFiles;
+        for(int j = 0; j < presetsAndConfig.Presets[i].FilesToSave.size(); j++){
+            QFileInfo fileInfo(presetsAndConfig.Presets[i].FilesToSave[j]);
+            if(!fileInfo.exists() || !fileInfo.isFile())
+                indexOfInvalidFiles.push_back(j);
+        }
+        if(!indexOfInvalidFiles.isEmpty()){
+            for(int index = indexOfInvalidFiles.size() - 1; index >= 0; index--)
+                presetsAndConfig.Presets[i].FilesToSave.removeAt(indexOfInvalidFiles[index]);
+            configChanged = true;
+        }
+        QList<int> indexOfInvalidFolders;
+        for(int j = 0; j < presetsAndConfig.Presets[i].FoldersToSave.size(); j++){
+            QFileInfo folderInfo(presetsAndConfig.Presets[i].FoldersToSave[j]);
+            if(!folderInfo.exists() || !folderInfo.isDir())
+                indexOfInvalidFolders.push_back(j);
+        }
+        if(!indexOfInvalidFolders.isEmpty()){
+            for(int index = indexOfInvalidFolders.size() - 1; index >= 0; index--)
+                presetsAndConfig.Presets[i].FoldersToSave.removeAt(indexOfInvalidFolders[index]);
+            configChanged = true;
+        }
+    }
+    if(!indexOfPresetsWithInvalidName.isEmpty()){
+        for(int i = indexOfPresetsWithInvalidName.size() - 1; i >= 0; i--)
+            presetsAndConfig.Presets.removeAt(indexOfPresetsWithInvalidName[i]);
+        configChanged = true;
+    }
     if(configChanged)
         Save();
 }
@@ -137,13 +182,12 @@ void ConfigManager::AddNewPreset(QString presetName){
     presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
 }
 
-int ConfigManager::RemovePresetAt(int index){
-    if(presetsAndConfig.Presets.size() < 1)
-        return -1;
+void ConfigManager::RemovePresetAt(int index){
+    if(presetsAndConfig.Presets.isEmpty())
+        return;
     presetsAndConfig.CurrentPresetIndex = index;
     presetsAndConfig.Presets.removeAt(presetsAndConfig.CurrentPresetIndex);
     presetsAndConfig.CurrentPresetIndex = (presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()) ? (presetsAndConfig.Presets.size() - 1) : presetsAndConfig.CurrentPresetIndex;
-    return presetsAndConfig.CurrentPresetIndex;
 }
 
 bool ConfigManager::isFileNameValid(QString name){

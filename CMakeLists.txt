@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
         src/FilesDialog/filesdialog.h
         src/FilesDialog/filesdialog.cpp
         src/FilesDialog/filesdialog.ui
+        src/backupmanager.h
+        src/backupmanager.cpp
         ${TS_FILES}
 )
 

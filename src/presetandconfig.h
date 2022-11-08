@@ -64,7 +64,7 @@ public:
 
     static void AddNewPreset(QString presetName);
 
-    static int RemovePresetAt(int index);
+    static void RemovePresetAt(int index);
 
     static bool isFileNameValid(QString name);
 

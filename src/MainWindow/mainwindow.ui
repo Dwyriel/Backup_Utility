@@ -252,7 +252,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Working...</string>
+     <string>placeholder</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

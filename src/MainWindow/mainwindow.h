@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QTimer>
 
 #include <src/CustomLineEdit/customlineedit.h>
 #include <src/InputDialog/inputdialog.h>
@@ -25,14 +26,17 @@ public:
 private:
     Ui::MainWindow *ui;
     bool isBackupInProgress = false;
+    QTimer *labelTimer;
 
-    void setWidgetVisibility();
+    void setUiWidgetVisibility();
 
-    void setWidgetValues();
+    void setUiWidgetValues();
 
     void connectSignals();
 
     void setWidgetEnabled();
+
+    void prepareLabelTimer();
 
 private slots:
     void actionMultithreadedToggled(bool checked);
@@ -44,6 +48,7 @@ private slots:
     void btnFilesClicked();
     void btnBackupClicked();
     void checkBoxAllPresetsStateChanged(int state);
+    void labelTimerTimeout();
 };
 
 #endif // MAINWINDOW_H

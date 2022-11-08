@@ -18,6 +18,7 @@ QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.conf";
 QDir ConfigManager::currentDir;
 QFileInfo ConfigManager::PresetsAndConfigFile;
 PresetsAndConfig ConfigManager::presetsAndConfig;
+bool ConfigManager::fileLoaded = false;
 
 void ConfigManager::Initialize(){
     currentDir = QDir(QCoreApplication::applicationDirPath());
@@ -78,6 +79,7 @@ void ConfigManager::Load(){
         preset.FoldersToSave = foldersToSaveList;
         presetsAndConfig.Presets.push_back(std::move(preset));
     }
+    fileLoaded = true;
 }
 
 void ConfigManager::Save(){

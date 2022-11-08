@@ -5,22 +5,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     ConfigManager::Initialize();
-    setWidgetVisibility();
-    setWidgetValues();
+    setUiWidgetVisibility();
+    setUiWidgetValues();
+    prepareLabelTimer();
     connectSignals();
 }
 
 MainWindow::~MainWindow(){
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
     delete ui;
+    delete labelTimer;
 }
 
-void MainWindow::setWidgetVisibility(){
+void MainWindow::setUiWidgetVisibility(){
     ui->actionAll_presets->setVisible(!ui->menubar->isNativeMenuBar());
     ui->checkBoxAllPresets->setVisible(ui->menubar->isNativeMenuBar());
 }
 
-void MainWindow::setWidgetValues(){
+void MainWindow::setUiWidgetValues(){
     ui->actionMultithreaded->setChecked(ConfigManager::presetsAndConfig.Multithreaded);
     ui->actionAll_presets->setChecked(ConfigManager::presetsAndConfig.BackupAllPresets);
     ui->inputBackupFolder->setText(ConfigManager::presetsAndConfig.BackupFolderPath);
@@ -43,6 +45,7 @@ void MainWindow::connectSignals(){
     connect(ui->btnFiles, &QPushButton::clicked, this, &MainWindow::btnFilesClicked);
     connect(ui->btnBackup, &QPushButton::clicked, this, &MainWindow::btnBackupClicked);
     connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresetsStateChanged);
+    connect(labelTimer, &QTimer::timeout, this, &MainWindow::labelTimerTimeout);
 }
 
 void MainWindow::setWidgetEnabled(){
@@ -57,6 +60,14 @@ void MainWindow::setWidgetEnabled(){
     ui->btnFiles->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
     ui->btnBackup->setDisabled(isBackupInProgress);
     ui->checkBoxAllPresets->setDisabled(isBackupInProgress);
+}
+
+void MainWindow::prepareLabelTimer(){
+    labelTimer = new QTimer(this);
+    labelTimer->setSingleShot(true);
+    labelTimer->setInterval(5000);
+    ui->lblStatus->setText(ConfigManager::fileLoaded ? tr("Welcome back :)") : tr("Hello there~"));
+    labelTimer->start();
 }
 
 void MainWindow::actionMultithreadedToggled(bool checked){
@@ -119,7 +130,7 @@ void MainWindow::btnNewPresetClicked(){
         return;
     }
     ConfigManager::AddNewPreset(dialog.OutputString);
-    setWidgetValues();
+    setUiWidgetValues();
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
@@ -128,7 +139,7 @@ void MainWindow::btnDeletePresetClicked(){
     if(result != QMessageBox::Yes)
         return;
     ConfigManager::RemovePresetAt(ui->comboBoxPresets->currentIndex());
-    setWidgetValues();
+    setUiWidgetValues();
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
 }
 
@@ -170,4 +181,8 @@ void MainWindow::btnBackupClicked(){}//use index from combobox
 void MainWindow::checkBoxAllPresetsStateChanged(int state){
     ConfigManager::presetsAndConfig.BackupAllPresets = state;
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+}
+
+void MainWindow::labelTimerTimeout(){
+    ui->lblStatus->setText("");
 }

@@ -46,6 +46,8 @@ class ConfigManager
 public:
     static PresetsAndConfig presetsAndConfig;
 
+    static bool fileLoaded;
+
     ConfigManager() = delete;
 
     ~ConfigManager() = delete;

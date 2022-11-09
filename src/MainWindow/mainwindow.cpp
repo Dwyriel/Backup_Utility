@@ -227,6 +227,7 @@ void MainWindow::backupComplete(bool wasSuccessful){
     backupThread = nullptr;
     setWidgetEnabled();
     labelTimer->start();
+    ConfigManager::Save();
 }
 
 void MainWindow::labelTimerTimeout(){

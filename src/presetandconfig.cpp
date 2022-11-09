@@ -3,7 +3,7 @@
 /*Preset*/
 Preset::Preset(){}
 
-Preset::Preset(QString presetName) : PresetName(presetName), BackupNumber(1), FilesToSave(QStringList()), FoldersToSave(QStringList()){}
+Preset::Preset(QString presetName) : PresetName(presetName){}
 
 Preset::Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave) : PresetName(presetName), BackupNumber(backupNumber), FilesToSave(filesToSave), FoldersToSave(FoldersToSave){}
 

@@ -70,6 +70,8 @@ public:
 
     static bool isFileNameValid(QString name);
 
+    static bool isThereItemsToSave();
+
 private:
     static PresetsAndConfig defaultPresetsAndConfig;
     static QString PresetsAndConfigFileName;

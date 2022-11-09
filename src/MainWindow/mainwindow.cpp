@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     ConfigManager::Initialize();
+    backupManager = new BackupManager(this);
     setUiWidgetVisibility();
     setUiWidgetValues();
     prepareLabelTimer();
@@ -14,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow(){
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
     delete ui;
+    delete backupManager;
     delete labelTimer;
 }
 
@@ -43,8 +45,9 @@ void MainWindow::connectSignals(){
     connect(ui->BtnDeletePreset, &QPushButton::clicked, this, &MainWindow::btnDeletePresetClicked);
     connect(ui->btnSearch, &QPushButton::clicked, this, &MainWindow::btnSearchFolderClicked);
     connect(ui->btnFiles, &QPushButton::clicked, this, &MainWindow::btnFilesClicked);
-    connect(ui->btnBackup, &QPushButton::clicked, this, &MainWindow::btnBackupClicked);
     connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresetsStateChanged);
+    connect(ui->btnBackup, &QPushButton::clicked, this, &MainWindow::btnBackupClicked);
+    connect(backupManager, &BackupManager::backupComplete, this, &MainWindow::backupComplete);
     connect(labelTimer, &QTimer::timeout, this, &MainWindow::labelTimerTimeout);
 }
 
@@ -58,7 +61,6 @@ void MainWindow::setWidgetEnabled(){
     ui->BtnDeletePreset->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
     ui->btnSearch->setDisabled(isBackupInProgress);
     ui->btnFiles->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
-    ui->btnBackup->setDisabled(isBackupInProgress);
     ui->checkBoxAllPresets->setDisabled(isBackupInProgress);
 }
 
@@ -176,11 +178,55 @@ void MainWindow::btnFilesClicked(){
     ConfigManager::Save();
 }
 
-void MainWindow::btnBackupClicked(){}//use index from combobox
-
 void MainWindow::checkBoxAllPresetsStateChanged(int state){
     ConfigManager::presetsAndConfig.BackupAllPresets = state;
     ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+}
+
+void MainWindow::btnBackupClicked(){
+    if(isBackupInProgress){
+        QString notDoneYet = (btnBackupClickCounter >= 2) ? tr("Not done yet baka!") : (btnBackupClickCounter == 1) ? tr("Hold your horses") : tr("Still working on it");
+        ui->lblStatus->setText(notDoneYet);
+        btnBackupClickCounter++;
+        return;
+    }
+    ConfigManager::presetsAndConfig.CurrentPresetIndex = ui->comboBoxPresets->currentIndex();
+    if(labelTimer->isActive())
+        labelTimer->stop();
+    if(ui->comboBoxPresets->count() < 1){
+        ui->lblStatus->setText(tr("Create a Preset first"));
+        labelTimer->start();
+        return;
+    }
+    QFileInfo backupFolder(ui->inputBackupFolder->text());
+    if(!backupFolder.exists() || !backupFolder.isDir() || backupFolder.isRoot() || !backupFolder.isWritable()){
+        ui->lblStatus->setText(tr("Invalid Backup Folder"));
+        labelTimer->start();
+        return;
+    }
+    if(!ConfigManager::isThereItemsToSave()){
+        ui->lblStatus->setText(tr("No items to backup"));
+        labelTimer->start();
+        return;
+    }
+    ConfigManager::presetsAndConfig.CurrentPresetIndex = ui->comboBoxPresets->currentIndex();
+    isBackupInProgress = true;
+    setWidgetEnabled();
+    ui->lblStatus->setText(tr("Working on it.."));
+    backupThread = QThread::create([this](){
+        this->backupManager->Backup();
+    });
+    backupThread->start();
+}
+
+void MainWindow::backupComplete(bool wasSuccessful){
+    ui->lblStatus->setText(wasSuccessful ? tr("Done!") : tr("Failed :("));
+    isBackupInProgress = false;
+    btnBackupClickCounter = 0;
+    delete backupThread;
+    backupThread = nullptr;
+    setWidgetEnabled();
+    labelTimer->start();
 }
 
 void MainWindow::labelTimerTimeout(){

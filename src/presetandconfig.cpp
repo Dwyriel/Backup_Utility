@@ -31,7 +31,7 @@ void ConfigManager::Initialize(){
 }
 
 Preset& ConfigManager::CurrentPreset(){
-    return std::ref(presetsAndConfig.Presets[presetsAndConfig.CurrentPresetIndex]);
+    return presetsAndConfig.Presets[presetsAndConfig.CurrentPresetIndex];
 }
 
 void ConfigManager::Load(){
@@ -198,4 +198,18 @@ bool ConfigManager::isFileNameValid(QString name){
 #else
     return !name.contains(R"(/)");
 #endif
+}
+
+bool ConfigManager::isThereItemsToSave(){
+    if(presetsAndConfig.Presets.isEmpty())
+        return false;
+    if(!presetsAndConfig.BackupAllPresets)
+        return (!CurrentPreset().FilesToSave.isEmpty() || !CurrentPreset().FoldersToSave.isEmpty());
+    bool filesToSave = false;
+    for(auto& preset : presetsAndConfig.Presets){
+        filesToSave = (!preset.FilesToSave.isEmpty() || !preset.FoldersToSave.isEmpty());
+        if(filesToSave)
+            break;
+    }
+    return filesToSave;
 }

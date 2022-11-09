@@ -9,6 +9,7 @@
 #include <src/InputDialog/inputdialog.h>
 #include <src/FilesDialog/filesdialog.h>
 #include <src/presetandconfig.h>
+#include <src/backupmanager.h>
 #include <src/utility.h>
 
 QT_BEGIN_NAMESPACE
@@ -25,8 +26,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    BackupManager *backupManager;
+    QThread *backupThread;
     bool isBackupInProgress = false;
     QTimer *labelTimer;
+    int btnBackupClickCounter = 0;
 
     void setUiWidgetVisibility();
 
@@ -46,8 +50,9 @@ private slots:
     void btnDeletePresetClicked();
     void btnSearchFolderClicked();
     void btnFilesClicked();
-    void btnBackupClicked();
     void checkBoxAllPresetsStateChanged(int state);
+    void btnBackupClicked();
+    void backupComplete(bool wasSuccessful);
     void labelTimerTimeout();
 };
 

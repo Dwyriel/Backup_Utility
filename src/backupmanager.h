@@ -29,17 +29,17 @@ private:
 
     bool BackupPresetMT(Preset &presetToBackup);
 
-    bool BackupFileMT(const QDir &backupFolder, const QString &fileToBackup);
+    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup);
 
-    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString folderToBackup);
+    bool BackupFileMT(const QDir &backupFolder, const QString &fileToBackup);
 
     void BackupST(const int index = -1);
 
     bool BackupPresetST(Preset &presetToBackup);
 
-    bool BackupFileST(const QDir &backupFolder, const QString &fileToBackup);
+    bool BackupEverythingInDirST(const QDir &backupFolder, const QString &folderToBackup);
 
-    bool BackupEverythingInDirST(const QDir &backupFolder, const QString folderToBackup);
+    bool BackupFileST(const QDir &backupFolder, const QString &fileToBackup);
 
     class BackupFileTask : public QRunnable
     {

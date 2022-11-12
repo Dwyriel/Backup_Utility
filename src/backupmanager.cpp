@@ -32,11 +32,11 @@ bool BackupManager::BackupPresetMT(Preset &presetToBackup){
     return true;
 }
 
-bool BackupManager::BackupFileMT(const QDir &backupFolder, const QString &fileToBackup){
+bool BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup){
     return true;
 }
 
-bool BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString folderToBackup){
+bool BackupManager::BackupFileMT(const QDir &backupFolder, const QString &fileToBackup){
     return true;
 }
 
@@ -77,17 +77,7 @@ bool BackupManager::BackupPresetST(Preset &presetToBackup){
     return true;
 }
 
-bool BackupManager::BackupFileST(const QDir &backupFolder, const QString &fileToBackup){
-    QFileInfo fileInfo(fileToBackup);
-    QFileInfo newFileInfo(backupFolder.path() + QDir::separator() + fileInfo.fileName());
-    if(newFileInfo.exists())
-        QFile::remove(newFileInfo.absoluteFilePath());
-    if(!QFile::copy(fileToBackup, newFileInfo.absoluteFilePath()))
-        return false;
-    return true;
-}
-
-bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QString folderToBackup){
+bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QString &folderToBackup){
     QFileInfo folderInfo(folderToBackup);
     QDir folder(folderToBackup);
     folder.setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
@@ -105,6 +95,16 @@ bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QStr
             if(!BackupEverythingInDirST(newFolder, entryInfo.absoluteFilePath()))
                 return false;
     }
+    return true;
+}
+
+bool BackupManager::BackupFileST(const QDir &backupFolder, const QString &fileToBackup){
+    QFileInfo fileInfo(fileToBackup);
+    QFileInfo newFileInfo(backupFolder.path() + QDir::separator() + fileInfo.fileName());
+    if(newFileInfo.exists())
+        QFile::remove(newFileInfo.absoluteFilePath());
+    if(!QFile::copy(fileToBackup, newFileInfo.absoluteFilePath()))
+        return false;
     return true;
 }
 

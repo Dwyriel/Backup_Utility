@@ -3,7 +3,6 @@
 
 #include <QRunnable>
 
-
 #include <src/presetandconfig.h>
 
 class SaveConfigToFileTask : public QRunnable

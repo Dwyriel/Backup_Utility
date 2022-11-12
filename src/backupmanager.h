@@ -9,9 +9,12 @@
 class BackupManager : public QObject{
     Q_OBJECT
 public:
-    static BackupManager& Instance();
+    [[nodiscard]] static BackupManager& Instance();
 
     void Backup();
+
+signals:
+    void backupComplete(bool wasSuccessful);
 
 private:
     static BackupManager backupManagerInstance;
@@ -38,8 +41,15 @@ private:
 
     bool BackupEverythingInDirST(const QDir &backupFolder, const QString folderToBackup);
 
-signals:
-    void backupComplete(bool wasSuccessful);
+    class BackupFileTask : public QRunnable
+    {
+        QDir _backupFolder;
+        QString _fileToBackup;
+    public:
+        BackupFileTask(const QDir &backupFolder, const QString &fileToBackup);
+
+        void run() override;
+    };
 };
 
 #endif // BACKUPMANAGER_H

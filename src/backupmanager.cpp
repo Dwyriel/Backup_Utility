@@ -1,5 +1,6 @@
 #include "backupmanager.h"
 
+/*BackupManager*/
 BackupManager BackupManager::backupManagerInstance = BackupManager();
 
 BackupManager& BackupManager::Instance(){
@@ -105,4 +106,13 @@ bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QStr
                 return false;
     }
     return true;
+}
+
+/*BackupManager::BackupFileTask*/
+BackupManager::BackupFileTask::BackupFileTask(const QDir &backupFolder, const QString &fileToBackup) : _backupFolder(backupFolder), _fileToBackup(fileToBackup){
+    setAutoDelete(true);
+}
+
+void BackupManager::BackupFileTask::run(){
+    BackupManager::Instance().BackupFileST(_backupFolder, _fileToBackup);
 }

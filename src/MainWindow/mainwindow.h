@@ -28,7 +28,6 @@ public:
 private:
     Ui::MainWindow *ui;
     QThreadPool *threadPool;
-    BackupManager *backupManager;
     QThread *backupThread;
     bool isBackupInProgress = false;
     QTimer *labelTimer;

@@ -16,7 +16,6 @@ MainWindow::~MainWindow(){
     threadPool->waitForDone();
     delete ui;
     delete threadPool;
-    delete backupManager;
     delete labelTimer;
 }
 
@@ -61,7 +60,7 @@ void MainWindow::connectSignals(){
     connect(ui->btnFiles, &QPushButton::clicked, this, &MainWindow::btnFilesClicked);
     connect(ui->checkBoxAllPresets, &QCheckBox::stateChanged, this, &MainWindow::checkBoxAllPresetsStateChanged);
     connect(ui->btnBackup, &QPushButton::clicked, this, &MainWindow::btnBackupClicked);
-    connect(backupManager, &BackupManager::backupComplete, this, &MainWindow::backupComplete);
+    connect(&BackupManager::Instance(), &BackupManager::backupComplete, this, &MainWindow::backupComplete);
     connect(labelTimer, &QTimer::timeout, this, &MainWindow::labelTimerTimeout);
 }
 
@@ -69,7 +68,6 @@ void MainWindow::prepareLocalInstances(){
     ui->setupUi(this);
     threadPool = new QThreadPool(this);
     threadPool->setMaxThreadCount(1);
-    backupManager = new BackupManager(this);
     labelTimer = new QTimer(this);
     labelTimer->setSingleShot(true);
     labelTimer->setInterval(5000);
@@ -222,7 +220,7 @@ void MainWindow::btnBackupClicked(){
     setWidgetEnabled();
     ui->lblStatus->setText(tr("Working on it.."));
     backupThread = QThread::create([this](){
-        this->backupManager->Backup();
+        BackupManager::Instance().Backup();
     });
     backupThread->start();
 }

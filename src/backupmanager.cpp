@@ -1,6 +1,18 @@
 #include "backupmanager.h"
 
-BackupManager::BackupManager(QWidget *parent) : QObject(parent){}
+BackupManager BackupManager::backupManagerInstance = BackupManager();
+
+BackupManager& BackupManager::Instance(){
+    return backupManagerInstance;
+}
+
+BackupManager::BackupManager(QWidget *parent) : QObject(parent){
+    threadPool = new QThreadPool();
+}
+
+BackupManager::~BackupManager(){
+    delete threadPool;
+}
 
 void BackupManager::Backup(){
     if(ConfigManager::presetsAndConfig.Multithreaded)
@@ -11,8 +23,8 @@ void BackupManager::Backup(){
 
 void BackupManager::BackupMT(const int index){
     bool success = false;
-    BackupST(index);
-    return;
+
+    emit backupComplete(success);
 }
 
 bool BackupManager::BackupPresetMT(Preset &presetToBackup){

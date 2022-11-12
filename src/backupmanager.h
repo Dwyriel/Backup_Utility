@@ -9,12 +9,19 @@
 class BackupManager : public QObject{
     Q_OBJECT
 public:
-
-    BackupManager(QWidget *parent = nullptr);
+    static BackupManager& Instance();
 
     void Backup();
 
 private:
+    static BackupManager backupManagerInstance;
+
+    QThreadPool *threadPool;
+
+    BackupManager(QWidget *parent = nullptr);
+
+    ~BackupManager();
+
     void BackupMT(const int index = -1);
 
     bool BackupPresetMT(Preset &presetToBackup);
@@ -32,7 +39,6 @@ private:
     bool BackupEverythingInDirST(const QDir &backupFolder, const QString folderToBackup);
 
 signals:
-
     void backupComplete(bool wasSuccessful);
 };
 

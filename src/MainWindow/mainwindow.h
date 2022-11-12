@@ -11,6 +11,7 @@
 #include <src/presetandconfig.h>
 #include <src/backupmanager.h>
 #include <src/utility.h>
+#include <src/qrunnables.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +27,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QThreadPool *threadPool;
     BackupManager *backupManager;
     QThread *backupThread;
     bool isBackupInProgress = false;
@@ -36,11 +38,13 @@ private:
 
     void setUiWidgetValues();
 
-    void connectSignals();
-
     void setWidgetEnabled();
 
-    void prepareLabelTimer();
+    void connectSignals();
+
+    void prepareLocalInstances();
+
+    void setStartupText();
 
 private slots:
     void actionMultithreadedToggled(bool checked);

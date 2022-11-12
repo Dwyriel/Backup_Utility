@@ -58,9 +58,7 @@ public:
 
     static void Load();
 
-    static void Save();
-
-    static void Save(int index);
+    static void Save(int index = -1);
 
     static void CheckFilesIntegrity();
 

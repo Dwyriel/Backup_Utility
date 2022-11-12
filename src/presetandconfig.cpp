@@ -82,7 +82,9 @@ void ConfigManager::Load(){
     fileLoaded = true;
 }
 
-void ConfigManager::Save(){
+void ConfigManager::Save(int index){
+    if(index >= 0)
+        presetsAndConfig.CurrentPresetIndex = index;
     QFile file(PresetsAndConfigFile.absoluteFilePath());
     if(!file.open(QIODeviceBase::ReadWrite | QIODeviceBase::Truncate | QIODeviceBase::Text))
         return;
@@ -113,11 +115,6 @@ void ConfigManager::Save(){
     QTextStream outStream(&file);
     outStream << bytes;
     file.close();
-}
-
-void ConfigManager::Save(int index){
-    presetsAndConfig.CurrentPresetIndex = index;
-    Save();
 }
 
 void ConfigManager::CheckFilesIntegrity(){

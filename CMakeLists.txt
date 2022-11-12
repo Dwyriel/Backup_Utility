@@ -21,13 +21,17 @@ set(TS_FILES Backup_Utility_en_US.ts)
 set(PROJECT_SOURCES
         main.cpp
         resources.qrc
+        src/utility.h
+        src/utility.cpp
+        src/presetandconfig.cpp
+        src/presetandconfig.h
+        src/backupmanager.h
+        src/backupmanager.cpp
+        src/qrunnables.h
+        src/qrunnables.cpp
         src/MainWindow/mainwindow.cpp
         src/MainWindow/mainwindow.h
         src/MainWindow/mainwindow.ui
-        src/presetandconfig.cpp
-        src/presetandconfig.h
-        src/utility.h
-        src/utility.cpp
         src/CustomLineEdit/customlineedit.h
         src/CustomLineEdit/customlineedit.cpp
         src/InputDialog/inputdialog.h
@@ -36,8 +40,6 @@ set(PROJECT_SOURCES
         src/FilesDialog/filesdialog.h
         src/FilesDialog/filesdialog.cpp
         src/FilesDialog/filesdialog.ui
-        src/backupmanager.h
-        src/backupmanager.cpp
         ${TS_FILES}
 )
 

@@ -2,19 +2,20 @@
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
-    ui->setupUi(this);
+    prepareLocalInstances();
     setWindowIcon(QIcon(":/resources/icon/icon.ico"));
     ConfigManager::Initialize();
-    backupManager = new BackupManager(this);
     setUiWidgetVisibility();
     setUiWidgetValues();
-    prepareLabelTimer();
     connectSignals();
+    setStartupText();
 }
 
 MainWindow::~MainWindow(){
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
+    threadPool->waitForDone();
     delete ui;
+    delete threadPool;
     delete backupManager;
     delete labelTimer;
 }
@@ -36,6 +37,19 @@ void MainWindow::setUiWidgetValues(){
     setWidgetEnabled();
 }
 
+void MainWindow::setWidgetEnabled(){
+    ui->actionQuit->setDisabled(isBackupInProgress);
+    ui->actionMultithreaded->setDisabled(isBackupInProgress);
+    ui->actionAll_presets->setDisabled(isBackupInProgress);
+    ui->inputBackupFolder->setDisabled(isBackupInProgress);
+    ui->comboBoxPresets->setDisabled(isBackupInProgress);
+    ui->btnNewPreset->setDisabled(isBackupInProgress);
+    ui->BtnDeletePreset->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
+    ui->btnSearch->setDisabled(isBackupInProgress);
+    ui->btnFiles->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
+    ui->checkBoxAllPresets->setDisabled(isBackupInProgress);
+}
+
 void MainWindow::connectSignals(){
     connect(ui->actionQuit, &QAction::triggered, &QApplication::quit);
     connect(ui->actionMultithreaded, &QAction::toggled, this, &MainWindow::actionMultithreadedToggled);
@@ -51,35 +65,29 @@ void MainWindow::connectSignals(){
     connect(labelTimer, &QTimer::timeout, this, &MainWindow::labelTimerTimeout);
 }
 
-void MainWindow::setWidgetEnabled(){
-    ui->actionQuit->setDisabled(isBackupInProgress);
-    ui->actionMultithreaded->setDisabled(isBackupInProgress);
-    ui->actionAll_presets->setDisabled(isBackupInProgress);
-    ui->inputBackupFolder->setDisabled(isBackupInProgress);
-    ui->comboBoxPresets->setDisabled(isBackupInProgress);
-    ui->btnNewPreset->setDisabled(isBackupInProgress);
-    ui->BtnDeletePreset->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
-    ui->btnSearch->setDisabled(isBackupInProgress);
-    ui->btnFiles->setDisabled(isBackupInProgress || ui->comboBoxPresets->count() < 1);
-    ui->checkBoxAllPresets->setDisabled(isBackupInProgress);
-}
-
-void MainWindow::prepareLabelTimer(){
+void MainWindow::prepareLocalInstances(){
+    ui->setupUi(this);
+    threadPool = new QThreadPool(this);
+    threadPool->setMaxThreadCount(1);
+    backupManager = new BackupManager(this);
     labelTimer = new QTimer(this);
     labelTimer->setSingleShot(true);
     labelTimer->setInterval(5000);
+}
+
+void MainWindow::setStartupText(){
     ui->lblStatus->setText(ConfigManager::fileLoaded ? tr("Welcome back :)") : tr("Hello there~"));
     labelTimer->start();
 }
 
 void MainWindow::actionMultithreadedToggled(bool checked){
     ConfigManager::presetsAndConfig.Multithreaded = checked;
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::actionAllPresetsToggled(bool checked){
     ConfigManager::presetsAndConfig.BackupAllPresets = checked;
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::inputBackupFolderLostFocus(){
@@ -113,7 +121,7 @@ void MainWindow::inputBackupFolderLostFocus(){
     }
     ui->inputBackupFolder->setText(inputtedFolder);
     ConfigManager::presetsAndConfig.BackupFolderPath = inputtedFolder;
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::btnNewPresetClicked(){
@@ -133,7 +141,7 @@ void MainWindow::btnNewPresetClicked(){
     }
     ConfigManager::AddNewPreset(dialog.OutputString);
     setUiWidgetValues();
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::btnDeletePresetClicked(){
@@ -142,7 +150,7 @@ void MainWindow::btnDeletePresetClicked(){
         return;
     ConfigManager::RemovePresetAt(ui->comboBoxPresets->currentIndex());
     setUiWidgetValues();
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::btnSearchFolderClicked(){
@@ -168,19 +176,19 @@ void MainWindow::btnSearchFolderClicked(){
     }
     ui->inputBackupFolder->setText(folder);
     ConfigManager::presetsAndConfig.BackupFolderPath = folder;
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::btnFilesClicked(){
     ConfigManager::presetsAndConfig.CurrentPresetIndex = ui->comboBoxPresets->currentIndex();
     FilesDialog fileDialog(this);
     fileDialog.exec();
-    ConfigManager::Save();
+    threadPool->start(new SaveConfigToFileTask());
 }
 
 void MainWindow::checkBoxAllPresetsStateChanged(int state){
     ConfigManager::presetsAndConfig.BackupAllPresets = state;
-    ConfigManager::Save(ui->comboBoxPresets->currentIndex());
+    threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));
 }
 
 void MainWindow::btnBackupClicked(){
@@ -227,7 +235,7 @@ void MainWindow::backupComplete(bool wasSuccessful){
     backupThread = nullptr;
     setWidgetEnabled();
     labelTimer->start();
-    ConfigManager::Save();
+    threadPool->start(new SaveConfigToFileTask());
 }
 
 void MainWindow::labelTimerTimeout(){

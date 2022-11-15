@@ -39,16 +39,6 @@ private:
     bool BackupEverythingInDirST(const QDir &backupFolder, const QString &folderToBackup);
 
     bool BackupFile(const QDir &backupFolder, const QString &fileToBackup);
-
-    class BackupFileTask : public QRunnable
-    {
-        QDir _backupFolder;
-        QString _fileToBackup;
-    public:
-        BackupFileTask(const QDir &backupFolder, const QString &fileToBackup);
-
-        void run() override;
-    };
 };
 
 #endif // BACKUPMANAGER_H

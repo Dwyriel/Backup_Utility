@@ -156,12 +156,3 @@ bool BackupManager::BackupFile(const QDir &backupFolder, const QString &fileToBa
         return false;
     return true;
 }
-
-/*BackupManager::BackupFileTask*/
-BackupManager::BackupFileTask::BackupFileTask(const QDir &backupFolder, const QString &fileToBackup) : _backupFolder(backupFolder), _fileToBackup(fileToBackup){
-    setAutoDelete(true);
-}
-
-void BackupManager::BackupFileTask::run(){
-    BackupManager::Instance().BackupFile(_backupFolder, _fileToBackup);
-}

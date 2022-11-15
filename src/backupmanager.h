@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QThreadPool>
+#include <QtConcurrent>
 
 #include <src/presetandconfig.h>
 
@@ -27,11 +28,9 @@ private:
 
     void BackupMT(const int index = -1);
 
-    bool BackupPresetMT(Preset &presetToBackup);
+    bool BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks);
 
-    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup);
-
-    bool BackupFileMT(const QDir &backupFolder, const QString &fileToBackup);
+    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBacku, QList<QFuture<bool>> &tasks);
 
     void BackupST(const int index = -1);
 
@@ -39,17 +38,7 @@ private:
 
     bool BackupEverythingInDirST(const QDir &backupFolder, const QString &folderToBackup);
 
-    bool BackupFileST(const QDir &backupFolder, const QString &fileToBackup);
-
-    class BackupFileTask : public QRunnable
-    {
-        QDir _backupFolder;
-        QString _fileToBackup;
-    public:
-        BackupFileTask(const QDir &backupFolder, const QString &fileToBackup);
-
-        void run() override;
-    };
+    bool BackupFile(const QDir &backupFolder, const QString &fileToBackup);
 };
 
 #endif // BACKUPMANAGER_H

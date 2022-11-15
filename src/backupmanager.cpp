@@ -22,18 +22,48 @@ void BackupManager::Backup(){
         BackupST(!ConfigManager::presetsAndConfig.BackupAllPresets ? ConfigManager::presetsAndConfig.CurrentPresetIndex : -1);
 }
 
-void BackupManager::BackupMT(const int index){
-    bool success = false;
+void Sleeperino(int i){
+    QThread::sleep(i);
+}
 
+void BackupManager::BackupMT(const int index){
+    QList<QFuture<bool>> tasks;
+    bool success = true;
+    if(index >= 0){
+        ConfigManager::presetsAndConfig.Presets[index].BackupNumber++;
+        BackupPresetMT(ConfigManager::presetsAndConfig.Presets[index], tasks);
+        for(auto &task : tasks){
+            if(!task.result())
+                success = false;
+        }
+        if(!success)
+            ConfigManager::presetsAndConfig.Presets[index].BackupNumber--;
+        emit backupComplete(success);
+        return;
+    }
+    for(auto &preset : ConfigManager::presetsAndConfig.Presets)
+        preset.BackupNumber++;
+    for(auto &preset : ConfigManager::presetsAndConfig.Presets)
+        BackupPresetMT(preset, tasks);
+    for(auto &task : tasks)
+        if(!task.result())
+            success = false;
+    if(!success)
+        for(auto &preset : ConfigManager::presetsAndConfig.Presets)
+            preset.BackupNumber--;
     emit backupComplete(success);
 }
 
-bool BackupManager::BackupPresetMT(Preset &presetToBackup){
-    return true;
+void BackupManager::BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks){
+    //example on how to use it
+    QDir qdir(".");
+    QString stringu("");
+    auto task = QtConcurrent::run(threadPool, &BackupManager::BackupFileMT, this, qdir, stringu);
+    return;
 }
 
-bool BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup){
-    return true;
+void BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup, QList<QFuture<bool>> &tasks){
+    return;
 }
 
 bool BackupManager::BackupFileMT(const QDir &backupFolder, const QString &fileToBackup){

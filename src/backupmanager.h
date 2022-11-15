@@ -28,11 +28,9 @@ private:
 
     void BackupMT(const int index = -1);
 
-    void BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks);
+    bool BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks);
 
-    void BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBacku, QList<QFuture<bool>> &tasks);
-
-    bool BackupFileMT(const QDir &backupFolder, const QString &fileToBackup);
+    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBacku, QList<QFuture<bool>> &tasks);
 
     void BackupST(const int index = -1);
 
@@ -40,7 +38,7 @@ private:
 
     bool BackupEverythingInDirST(const QDir &backupFolder, const QString &folderToBackup);
 
-    bool BackupFileST(const QDir &backupFolder, const QString &fileToBackup);
+    bool BackupFile(const QDir &backupFolder, const QString &fileToBackup);
 
     class BackupFileTask : public QRunnable
     {

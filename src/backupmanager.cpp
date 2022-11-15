@@ -22,16 +22,12 @@ void BackupManager::Backup(){
         BackupST(!ConfigManager::presetsAndConfig.BackupAllPresets ? ConfigManager::presetsAndConfig.CurrentPresetIndex : -1);
 }
 
-void Sleeperino(int i){
-    QThread::sleep(i);
-}
-
 void BackupManager::BackupMT(const int index){
     QList<QFuture<bool>> tasks;
     bool success = true;
     if(index >= 0){
         ConfigManager::presetsAndConfig.Presets[index].BackupNumber++;
-        BackupPresetMT(ConfigManager::presetsAndConfig.Presets[index], tasks);
+        success = BackupPresetMT(ConfigManager::presetsAndConfig.Presets[index], tasks);
         for(auto &task : tasks){
             if(!task.result())
                 success = false;
@@ -43,8 +39,11 @@ void BackupManager::BackupMT(const int index){
     }
     for(auto &preset : ConfigManager::presetsAndConfig.Presets)
         preset.BackupNumber++;
-    for(auto &preset : ConfigManager::presetsAndConfig.Presets)
-        BackupPresetMT(preset, tasks);
+    for(auto &preset : ConfigManager::presetsAndConfig.Presets){
+        success = BackupPresetMT(preset, tasks);
+        if(!success)
+            break;
+    }
     for(auto &task : tasks)
         if(!task.result())
             success = false;
@@ -54,19 +53,41 @@ void BackupManager::BackupMT(const int index){
     emit backupComplete(success);
 }
 
-void BackupManager::BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks){
-    //example on how to use it
-    QDir qdir(".");
-    QString stringu("");
-    auto task = QtConcurrent::run(threadPool, &BackupManager::BackupFileMT, this, qdir, stringu);
-    return;
+bool BackupManager::BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks){
+    QDir presetFolder(ConfigManager::presetsAndConfig.BackupFolderPath + QDir::separator() + presetToBackup.PresetName);
+    if(!presetFolder.exists())
+        if(!presetFolder.mkpath(presetFolder.path()))
+            return false;
+    QDir backupFolder(presetFolder.path() + QDir::separator() + "Backup " + QString::number(presetToBackup.BackupNumber));
+    if(!backupFolder.exists())
+        if(!backupFolder.mkpath(backupFolder.path()))
+            return false;
+    for(auto &file : presetToBackup.FilesToSave){
+        tasks.push_back(QtConcurrent::run(threadPool, &BackupManager::BackupFile, this, backupFolder, file));
+    }
+    for(auto &folder : presetToBackup.FoldersToSave)
+        if(!BackupEverythingInDirMT(backupFolder, folder, tasks))
+            return false;
+    return true;
 }
 
-void BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup, QList<QFuture<bool>> &tasks){
-    return;
-}
-
-bool BackupManager::BackupFileMT(const QDir &backupFolder, const QString &fileToBackup){
+bool BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup, QList<QFuture<bool>> &tasks){
+    QFileInfo folderInfo(folderToBackup);
+    QDir folder(folderToBackup);
+    folder.setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+    QFileInfo newFolderInfo(backupFolder.path() + QDir::separator() + folderInfo.fileName());
+    if(newFolderInfo.exists())
+        backupFolder.rmpath(newFolderInfo.absoluteFilePath());
+    if(!backupFolder.mkpath(newFolderInfo.absoluteFilePath()))
+        return false;
+    QDir newFolder(newFolderInfo.absoluteFilePath());
+    for(auto& entryInfo : folder.entryInfoList()){
+        if(entryInfo.isFile())
+            tasks.push_back(QtConcurrent::run(threadPool, &BackupManager::BackupFile, this, newFolder, entryInfo.absoluteFilePath()));
+        if(entryInfo.isDir())
+            if(!BackupEverythingInDirMT(newFolder, entryInfo.absoluteFilePath(), tasks))
+                return false;
+    }
     return true;
 }
 
@@ -96,14 +117,12 @@ bool BackupManager::BackupPresetST(Preset &presetToBackup){
     if(!backupFolder.exists())
         if(!backupFolder.mkpath(backupFolder.path()))
             return false;
-    for(auto &file : presetToBackup.FilesToSave){
-        if(!BackupFileST(backupFolder, file))
+    for(auto &file : presetToBackup.FilesToSave)
+        if(!BackupFile(backupFolder, file))
             return false;
-    }
-    for(auto &folder : presetToBackup.FoldersToSave){
+    for(auto &folder : presetToBackup.FoldersToSave)
         if(!BackupEverythingInDirST(backupFolder, folder))
             return false;
-    }
     return true;
 }
 
@@ -119,7 +138,7 @@ bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QStr
     QDir newFolder(newFolderInfo.absoluteFilePath());
     for(auto& entryInfo : folder.entryInfoList()){
         if(entryInfo.isFile())
-            if(!BackupFileST(newFolder, entryInfo.absoluteFilePath()))
+            if(!BackupFile(newFolder, entryInfo.absoluteFilePath()))
                 return false;
         if(entryInfo.isDir())
             if(!BackupEverythingInDirST(newFolder, entryInfo.absoluteFilePath()))
@@ -128,7 +147,7 @@ bool BackupManager::BackupEverythingInDirST(const QDir &backupFolder, const QStr
     return true;
 }
 
-bool BackupManager::BackupFileST(const QDir &backupFolder, const QString &fileToBackup){
+bool BackupManager::BackupFile(const QDir &backupFolder, const QString &fileToBackup){
     QFileInfo fileInfo(fileToBackup);
     QFileInfo newFileInfo(backupFolder.path() + QDir::separator() + fileInfo.fileName());
     if(newFileInfo.exists())
@@ -144,5 +163,5 @@ BackupManager::BackupFileTask::BackupFileTask(const QDir &backupFolder, const QS
 }
 
 void BackupManager::BackupFileTask::run(){
-    BackupManager::Instance().BackupFileST(_backupFolder, _fileToBackup);
+    BackupManager::Instance().BackupFile(_backupFolder, _fileToBackup);
 }

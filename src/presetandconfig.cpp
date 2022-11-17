@@ -119,7 +119,7 @@ void ConfigManager::Save(int index){
 
 void ConfigManager::CheckFilesIntegrity(){
     bool configChanged = false;
-    if(presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()){
+    if(!presetsAndConfig.Presets.isEmpty() && presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()){
         presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
         configChanged = true;
     }
@@ -127,7 +127,7 @@ void ConfigManager::CheckFilesIntegrity(){
         presetsAndConfig.CurrentPresetIndex = 0;
         configChanged = true;
     }
-    if(presetsAndConfig.Presets.isEmpty()){
+    if(presetsAndConfig.Presets.isEmpty() && presetsAndConfig.CurrentPresetIndex != 0){
         presetsAndConfig.CurrentPresetIndex = 0;
         configChanged = true;
     }

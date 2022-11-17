@@ -13,7 +13,6 @@ FilesDialog::~FilesDialog(){
     delete ui;
 }
 
-
 void FilesDialog::setFileList(){
     ui->listFiles->clear();
     for(int i = 0; i < ConfigManager::CurrentPreset().FilesToSave.size(); i++){

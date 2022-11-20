@@ -15,14 +15,12 @@ PresetsAndConfig::PresetsAndConfig(bool multithreaded, QString backupFolderPath,
 /*ConfigManager*/
 PresetsAndConfig ConfigManager::defaultPresetsAndConfig = PresetsAndConfig(true, "", 0, QList<Preset>());
 QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.conf";
-QDir ConfigManager::currentDir;
 QFileInfo ConfigManager::PresetsAndConfigFile;
 PresetsAndConfig ConfigManager::presetsAndConfig;
 bool ConfigManager::fileLoaded = false;
 
 void ConfigManager::Initialize(){
-    currentDir = QDir(QCoreApplication::applicationDirPath());
-    PresetsAndConfigFile = QFileInfo(ConfigManager::currentDir.absolutePath() + QDir::separator() + ConfigManager::PresetsAndConfigFileName);
+    PresetsAndConfigFile = QFileInfo(QStandardPaths::writableLocation(QStandardPaths::StandardLocation::ConfigLocation) + QDir::separator() + ConfigManager::PresetsAndConfigFileName);
     if(PresetsAndConfigFile.exists())
         Load();
     else

@@ -2,6 +2,7 @@
 #define PRESETANDCONFIG_H
 
 #include <QCoreApplication>
+#include <QStandardPaths>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -73,7 +74,6 @@ public:
 private:
     static PresetsAndConfig defaultPresetsAndConfig;
     static QString PresetsAndConfigFileName;
-    static QDir currentDir;
     static QFileInfo PresetsAndConfigFile;
 };
 

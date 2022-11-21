@@ -71,6 +71,8 @@ public:
 
     static bool isThereItemsToSave();
 
+    static bool doesPresetAlreadyExists(const QString &presetName);
+
 private:
     static PresetsAndConfig defaultPresetsAndConfig;
     static QString PresetsAndConfigFileName;

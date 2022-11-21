@@ -137,6 +137,10 @@ void MainWindow::btnNewPresetClicked(){
         btnNewPresetClicked();
         return;
     }
+    if(ConfigManager::doesPresetAlreadyExists(dialog.OutputString)){
+        Utility::showError(this, tr("Error"), tr("A preset with that name already exists"));
+        return;
+    }
     ConfigManager::AddNewPreset(dialog.OutputString);
     setUiWidgetValues();
     threadPool->start(new SaveConfigToFileTask(ui->comboBoxPresets->currentIndex()));

@@ -208,3 +208,10 @@ bool ConfigManager::isThereItemsToSave(){
     }
     return filesToSave;
 }
+
+bool ConfigManager::doesPresetAlreadyExists(const QString &presetName){
+    for(auto& preset : presetsAndConfig.Presets)
+        if(preset.PresetName == presetName)
+            return true;
+    return false;
+}

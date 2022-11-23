@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Backup_Utility VERSION 0.1 LANGUAGES CXX)
+project(Backup_Utility VERSION 1.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

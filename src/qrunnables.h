@@ -5,8 +5,7 @@
 
 #include <src/presetandconfig.h>
 
-class SaveConfigToFileTask : public QRunnable
-{
+class SaveConfigToFileTask : public QRunnable {
     int _indexArg;
 public:
 

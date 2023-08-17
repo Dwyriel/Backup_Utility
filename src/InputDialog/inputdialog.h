@@ -4,12 +4,11 @@
 #include <QDialog>
 
 namespace Ui {
-class InputDialog;
+    class InputDialog;
 }
 
-class InputDialog : public QDialog
-{
-    Q_OBJECT
+class InputDialog : public QDialog {
+Q_OBJECT
 
 public:
     explicit InputDialog(QWidget *parent = nullptr);
@@ -30,8 +29,11 @@ private:
     void connectSignals();
 
 private slots:
+
     void btnOkClicked();
+
     void btnCancelClicked();
+
     void inputTextEdited(QString text);
 };
 

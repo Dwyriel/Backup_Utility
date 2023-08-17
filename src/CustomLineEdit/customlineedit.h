@@ -4,13 +4,14 @@
 #include <QLineEdit>
 #include <QFocusEvent>
 
-class CustomLineEdit : public QLineEdit
-{
-    Q_OBJECT
+class CustomLineEdit : public QLineEdit {
+Q_OBJECT
+
 public:
     explicit CustomLineEdit(QWidget *parent = nullptr);
 
 signals:
+
     void lostFocus();
 
 protected:

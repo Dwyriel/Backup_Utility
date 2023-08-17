@@ -15,8 +15,7 @@
 
 #include <src/utility.h>
 
-struct Preset
-{
+struct Preset {
     QString PresetName;
     qint64 BackupNumber = 0;
     QStringList FilesToSave;
@@ -29,8 +28,7 @@ struct Preset
     Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave);
 };
 
-struct PresetsAndConfig
-{
+struct PresetsAndConfig {
     bool Multithreaded = true;
     bool BackupAllPresets = false;
     QString BackupFolderPath;
@@ -42,8 +40,7 @@ struct PresetsAndConfig
     PresetsAndConfig(bool multithreaded, QString backupFolderPath, int CurrentPresetIndex, QList<Preset> presets);
 };
 
-class ConfigManager
-{
+class ConfigManager {
 public:
     static PresetsAndConfig presetsAndConfig;
 
@@ -55,7 +52,7 @@ public:
 
     static void Initialize();
 
-    static Preset& CurrentPreset();
+    static Preset &CurrentPreset();
 
     static void Load();
 

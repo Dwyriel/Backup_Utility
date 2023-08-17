@@ -7,14 +7,16 @@
 
 #include <src/presetandconfig.h>
 
-class BackupManager : public QObject{
-    Q_OBJECT
+class BackupManager : public QObject {
+Q_OBJECT
+
 public:
-    [[nodiscard]] static BackupManager& Instance();
+    [[nodiscard]] static BackupManager &Instance();
 
     void Backup();
 
 signals:
+
     void backupComplete(bool wasSuccessful);
 
 private:

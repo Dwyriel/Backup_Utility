@@ -30,3 +30,19 @@ int Utility::showWarningWithButtons( QWidget *parent, QString title, QString bod
     msgBox.setStyleSheet(MSGBOX_STYLE_SHEET);
     return msgBox.exec();
 }
+
+void Utility::SetMultiFileDialog(QFileDialog &qFileDialog) {
+    qFileDialog.setFileMode(QFileDialog::ExistingFiles);
+    qFileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    qFileDialog.setOptions(QFileDialog::DontResolveSymlinks);
+    qFileDialog.setViewMode(QFileDialog::Detail);
+    qFileDialog.setFilter(qFileDialog.filter() | QDir::Hidden);
+}
+
+void Utility::SetSingleDirectoryDialog(QFileDialog &qFileDialog) {
+    qFileDialog.setFileMode(QFileDialog::Directory);
+    qFileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    qFileDialog.setOptions(QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly);
+    qFileDialog.setViewMode(QFileDialog::List);
+    qFileDialog.setFilter(qFileDialog.filter() | QDir::Hidden);
+}

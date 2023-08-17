@@ -156,9 +156,13 @@ void MainWindow::btnDeletePresetClicked(){
 }
 
 void MainWindow::btnSearchFolderClicked(){
-    QString folder = QFileDialog::getExistingDirectory(this, MainWindow::tr("Open Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if(folder == "")
+    QFileDialog qFileDialog(this);
+    qFileDialog.setWindowTitle(MainWindow::tr("Open Directory"));
+    qFileDialog.setDirectory(QDir::homePath());
+    Utility::SetSingleDirectoryDialog(qFileDialog);
+    if(qFileDialog.exec() != QDialog::Accepted)
         return;
+    QString folder = qFileDialog.selectedFiles()[0];
     QFileInfo fileInfo(folder);
     if(!fileInfo.isDir()){//Shouldn't be needed, still verifying to make sure
         Utility::showError(this, tr("Error"), tr("Needs to be a directory"));

@@ -46,10 +46,7 @@ void FilesDialog::btnAddFileClicked(){
     QFileDialog qFileDialog(this);
     qFileDialog.setWindowTitle(tr("Select Files"));
     qFileDialog.setDirectory(QDir::homePath());
-    qFileDialog.setFileMode(QFileDialog::ExistingFiles);
-    qFileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-    qFileDialog.setOptions(QFileDialog::DontResolveSymlinks);
-    qFileDialog.setViewMode(QFileDialog::List);
+    Utility::SetMultiFileDialog(qFileDialog);
     if(qFileDialog.exec() != QDialog::Accepted)
         return;
     auto files = qFileDialog.selectedFiles();
@@ -63,10 +60,7 @@ void FilesDialog::btnAddFolderClicked(){
     QFileDialog qFileDialog(this);
     qFileDialog.setWindowTitle(tr("Select Folder"));
     qFileDialog.setDirectory(QDir::homePath());
-    qFileDialog.setFileMode(QFileDialog::Directory);
-    qFileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-    qFileDialog.setOptions(QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly);
-    qFileDialog.setViewMode(QFileDialog::Detail);
+    Utility::SetSingleDirectoryDialog(qFileDialog);
     if(qFileDialog.exec() != QDialog::Accepted)
         return;
     auto folders = qFileDialog.selectedFiles();

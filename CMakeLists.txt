@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Backup_Utility VERSION 1.1 LANGUAGES CXX)
+project(Backup_Utility VERSION 1.2.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -71,7 +71,7 @@ endif ()
 target_link_libraries(Backup_Utility PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Concurrent)
 
 set_target_properties(Backup_Utility PROPERTIES
-        MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+        MACOSX_BUNDLE_GUI_IDENTIFIER dwyriel.backup_utility.com
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         MACOSX_BUNDLE TRUE

@@ -16,7 +16,7 @@ FilesDialog::~FilesDialog() {
 void FilesDialog::setFileList() {
     ui->listFiles->clear();
     for (int i = 0; i < ConfigManager::CurrentPreset().FilesToSave.size(); i++) {
-        QListWidgetItem *item = new QListWidgetItem(ConfigManager::CurrentPreset().FilesToSave[i], nullptr, QListWidgetItem::UserType);
+        auto *item = new QListWidgetItem(ConfigManager::CurrentPreset().FilesToSave[i], nullptr, QListWidgetItem::UserType);
         item->setData(Qt::UserRole, i);
         ui->listFiles->addItem(item);
     }
@@ -25,7 +25,7 @@ void FilesDialog::setFileList() {
 void FilesDialog::setFolderList() {
     ui->listFolders->clear();
     for (int i = 0; i < ConfigManager::CurrentPreset().FoldersToSave.size(); i++) {
-        QListWidgetItem *item = new QListWidgetItem(ConfigManager::CurrentPreset().FoldersToSave[i], nullptr, QListWidgetItem::UserType);
+        auto *item = new QListWidgetItem(ConfigManager::CurrentPreset().FoldersToSave[i], nullptr, QListWidgetItem::UserType);
         item->setData(Qt::UserRole, i);
         ui->listFolders->addItem(item);
     }
@@ -96,7 +96,7 @@ void FilesDialog::btnCloseClicked() {
 
 void FilesDialog::btnRemoveFileClicked() {
     auto itemList = ui->listFiles->selectedItems();
-    if (itemList.size() < 1)
+    if (itemList.isEmpty())
         return;
     QListWidgetItem *itemPointer;
     for (const auto &item: itemList)
@@ -107,7 +107,7 @@ void FilesDialog::btnRemoveFileClicked() {
 
 void FilesDialog::btnRemoveFolderClicked() {
     auto itemList = ui->listFolders->selectedItems();
-    if (itemList.size() < 1)
+    if (itemList.isEmpty())
         return;
     QListWidgetItem *itemPointer;
     for (const auto &item: itemList)

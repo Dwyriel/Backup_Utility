@@ -13,18 +13,16 @@ Q_OBJECT
 public:
     explicit InputDialog(QWidget *parent = nullptr);
 
-    explicit InputDialog(QString body, QWidget *parent = nullptr);
+    explicit InputDialog(const QString &body, QWidget *parent = nullptr);
 
-    explicit InputDialog(QString title, QString body, QWidget *parent = nullptr);
+    explicit InputDialog(const QString &title, const QString &body, QWidget *parent = nullptr);
 
-    ~InputDialog();
+    ~InputDialog() override;
 
-    QString OutputString;
+    QString OutputString = QString();
 
 private:
     Ui::InputDialog *ui;
-
-    QString *outputString;
 
     void connectSignals();
 
@@ -34,7 +32,7 @@ private slots:
 
     void btnCancelClicked();
 
-    void inputTextEdited(QString text);
+    void inputTextEdited(const QString &text);
 };
 
 #endif // INPUTDIALOG_H

@@ -7,14 +7,14 @@ InputDialog::InputDialog(QWidget *parent) : QDialog(parent), ui(new Ui::InputDia
     connectSignals();
 }
 
-InputDialog::InputDialog(QString body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog) {
+InputDialog::InputDialog(const QString &body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog) {
     ui->setupUi(this);
     ui->btnOk->setDisabled(true);
     ui->lblBody->setText(body);
     connectSignals();
 }
 
-InputDialog::InputDialog(QString title, QString body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog) {
+InputDialog::InputDialog(const QString &title, const QString &body, QWidget *parent) : QDialog(parent), ui(new Ui::InputDialog) {
     ui->setupUi(this);
     ui->btnOk->setDisabled(true);
     setWindowTitle(title);
@@ -40,7 +40,7 @@ void InputDialog::btnCancelClicked() {
     done(QDialog::Rejected);
 }
 
-void InputDialog::inputTextEdited(QString text) {
-    ui->btnOk->setDisabled(text == "");
+void InputDialog::inputTextEdited(const QString &text) {
+    ui->btnOk->setDisabled(text.isEmpty());
     OutputString = text;
 }

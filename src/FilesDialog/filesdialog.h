@@ -17,7 +17,7 @@ Q_OBJECT
 public:
     explicit FilesDialog(QWidget *parent = nullptr);
 
-    ~FilesDialog();
+    ~FilesDialog() override;
 
 private:
     Ui::FilesDialog *ui;

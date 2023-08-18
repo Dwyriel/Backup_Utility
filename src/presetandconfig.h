@@ -21,26 +21,29 @@ struct Preset {
     QStringList FilesToSave;
     QStringList FoldersToSave;
 
-    Preset();
+    Preset() = default;
 
-    Preset(QString presetName);
+    explicit Preset(QString presetName);
 
-    Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave);
+    explicit Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave);
 };
 
 struct PresetsAndConfig {
     bool Multithreaded = true;
     bool BackupAllPresets = false;
     QString BackupFolderPath;
-    int CurrentPresetIndex = 0;
+    qint64 CurrentPresetIndex = 0;
     QList<Preset> Presets;
 
-    PresetsAndConfig();
+    PresetsAndConfig() = default;
 
-    PresetsAndConfig(bool multithreaded, QString backupFolderPath, int CurrentPresetIndex, QList<Preset> presets);
+    PresetsAndConfig(bool multithreaded, int CurrentPresetIndex, QString backupFolderPath, QList<Preset> presets);
 };
 
 class ConfigManager {
+    static PresetsAndConfig defaultPresetsAndConfig;
+    static QString PresetsAndConfigFileName;
+    static QFileInfo PresetsAndConfigFile;
 public:
     static PresetsAndConfig presetsAndConfig;
 
@@ -60,20 +63,15 @@ public:
 
     static void CheckFilesIntegrity();
 
-    static void AddNewPreset(QString presetName);
+    static void AddNewPreset(const QString &presetName);
 
     static void RemovePresetAt(int index);
 
-    static bool isFileNameValid(QString name);
+    static bool isFileNameValid(const QString& name);
 
     static bool isThereItemsToSave();
 
     static bool doesPresetAlreadyExists(const QString &presetName);
-
-private:
-    static PresetsAndConfig defaultPresetsAndConfig;
-    static QString PresetsAndConfigFileName;
-    static QFileInfo PresetsAndConfigFile;
 };
 
 #endif // PRESETANDCONFIG_H

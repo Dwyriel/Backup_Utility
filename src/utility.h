@@ -5,11 +5,11 @@
 #include <QFileDialog>
 
 namespace Utility {
-    void showError(QWidget *parent, QString title, QString body);
+    void showError(QWidget *parent, const QString &title, const QString &body);
 
-    void showWarning(QWidget *parent, QString title, QString body);
+    void showWarning(QWidget *parent, const QString &title, const QString &body);
 
-    int showWarningWithButtons(QWidget *parent, QString title, QString body);
+    int showWarningWithButtons(QWidget *parent, const QString &title, const QString &body);
 
     void SetMultiFileDialog(QFileDialog &qFileDialog);
 

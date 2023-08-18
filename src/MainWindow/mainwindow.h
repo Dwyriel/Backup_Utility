@@ -21,16 +21,16 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
 
-    ~MainWindow();
+    ~MainWindow() override;
 
 private:
     Ui::MainWindow *ui;
-    QThreadPool *threadPool;
-    QThread *backupThread;
+    QThreadPool *threadPool = nullptr;
+    QTimer *labelTimer = nullptr;
+    QThread *backupThread = nullptr;
     bool isBackupInProgress = false;
-    QTimer *labelTimer;
     int btnBackupClickCounter = 0;
 
     void setUiWidgetVisibility();

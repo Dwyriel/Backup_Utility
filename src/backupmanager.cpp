@@ -22,7 +22,7 @@ void BackupManager::Backup() {
         BackupST(!ConfigManager::presetsAndConfig.BackupAllPresets ? ConfigManager::presetsAndConfig.CurrentPresetIndex : -1);
 }
 
-void BackupManager::BackupMT(const int index) {
+void BackupManager::BackupMT(const qint64 index) {
     QList<QFuture<bool>> tasks;
     bool success = true;
     if (index >= 0) {
@@ -91,7 +91,7 @@ bool BackupManager::BackupEverythingInDirMT(const QDir &backupFolder, const QStr
     return true;
 }
 
-void BackupManager::BackupST(const int index) {
+void BackupManager::BackupST(const qint64 index) {
     bool success = false;
     if (index >= 0) {
         success = BackupPresetST(ConfigManager::presetsAndConfig.Presets[index]);

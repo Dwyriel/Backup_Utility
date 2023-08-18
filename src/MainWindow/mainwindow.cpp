@@ -32,7 +32,7 @@ void MainWindow::setUiWidgetValues() {
     ui->comboBoxPresets->clear();
     for (const auto &item: ConfigManager::presetsAndConfig.Presets)
         ui->comboBoxPresets->addItem(item.PresetName);
-    ui->comboBoxPresets->setCurrentIndex(ui->comboBoxPresets->count() > 0 ? ConfigManager::presetsAndConfig.CurrentPresetIndex : -1);
+    ui->comboBoxPresets->setCurrentIndex(ui->comboBoxPresets->count() > 0 ? static_cast<int>(ConfigManager::presetsAndConfig.CurrentPresetIndex) : -1);
     setWidgetEnabled();
 }
 

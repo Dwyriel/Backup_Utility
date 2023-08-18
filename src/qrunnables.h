@@ -5,12 +5,11 @@
 
 #include <src/presetandconfig.h>
 
-class SaveConfigToFileTask : public QRunnable
-{
+class SaveConfigToFileTask : public QRunnable {
     int _indexArg;
 public:
 
-    SaveConfigToFileTask(int indexArg = -1);
+    explicit SaveConfigToFileTask(int indexArg = -1);
 
     void run() override;
 };

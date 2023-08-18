@@ -17,20 +17,20 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+
+    ~MainWindow() override;
 
 private:
     Ui::MainWindow *ui;
-    QThreadPool *threadPool;
-    QThread *backupThread;
+    QThreadPool *threadPool = nullptr;
+    QTimer *labelTimer = nullptr;
+    QThread *backupThread = nullptr;
     bool isBackupInProgress = false;
-    QTimer *labelTimer;
     int btnBackupClickCounter = 0;
 
     void setUiWidgetVisibility();
@@ -46,16 +46,27 @@ private:
     void setStartupText();
 
 private slots:
+
     void actionMultithreadedToggled(bool checked);
+
     void actionAllPresetsToggled(bool checked);
+
     void inputBackupFolderLostFocus();
+
     void btnNewPresetClicked();
+
     void btnDeletePresetClicked();
+
     void btnSearchFolderClicked();
+
     void btnFilesClicked();
+
     void checkBoxAllPresetsStateChanged(int state);
+
     void btnBackupClicked();
+
     void backupComplete(bool wasSuccessful);
+
     void labelTimerTimeout();
 };
 

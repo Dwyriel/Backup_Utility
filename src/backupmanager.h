@@ -7,14 +7,16 @@
 
 #include <src/presetandconfig.h>
 
-class BackupManager : public QObject{
-    Q_OBJECT
+class BackupManager : public QObject {
+Q_OBJECT
+
 public:
-    [[nodiscard]] static BackupManager& Instance();
+    [[nodiscard]] static BackupManager &Instance();
 
     void Backup();
 
 signals:
+
     void backupComplete(bool wasSuccessful);
 
 private:
@@ -22,17 +24,17 @@ private:
 
     QThreadPool *threadPool;
 
-    BackupManager(QWidget *parent = nullptr);
+    explicit BackupManager(QWidget *parent = nullptr);
 
-    ~BackupManager();
+    ~BackupManager() override;
 
-    void BackupMT(const int index = -1);
+    void BackupMT(qint64 index = -1);
 
     bool BackupPresetMT(Preset &presetToBackup, QList<QFuture<bool>> &tasks);
 
-    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBacku, QList<QFuture<bool>> &tasks);
+    bool BackupEverythingInDirMT(const QDir &backupFolder, const QString &folderToBackup, QList<QFuture<bool>> &tasks);
 
-    void BackupST(const int index = -1);
+    void BackupST(qint64 index = -1);
 
     bool BackupPresetST(Preset &presetToBackup);
 

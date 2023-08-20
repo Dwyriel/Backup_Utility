@@ -2,20 +2,40 @@
 
 #include <utility>
 
+/*Json key names*/
+const char *Multithreaded = "Multithreaded";
+const char *BackupAllPresets = "BackupAllPresets";
+const char *BackupFolderPath = "BackupFolderPath";
+const char *CurrentPresetIndex = "CurrentPresetIndex";
+const char *Presets = "Presets";
+const char *PresetName = "PresetName";
+const char *BackupNumber = "BackupNumber";
+const char *FilesToSave = "FilesToSave";
+const char *FoldersToSave = "FoldersToSave";
+
 /*Preset*/
+Preset::Preset() = default;
+
 Preset::Preset(QString presetName) : PresetName(std::move(presetName)) {}
 
-Preset::Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave) : PresetName(std::move(presetName)), BackupNumber(backupNumber), FilesToSave(std::move(filesToSave)), FoldersToSave(std::move(FoldersToSave)) {}
+Preset::Preset(QString presetName, qint64 backupNumber, QStringList filesToSave, QStringList FoldersToSave) : PresetName(std::move(presetName)), BackupNumber(backupNumber), FilesToSave(std::move(filesToSave)), FoldersToSave(std::move(FoldersToSave)) {}
 
 /*PresetsAndConfig*/
-PresetsAndConfig::PresetsAndConfig(bool multithreaded, int currentPresetIndex, QString backupFolderPath, QList<Preset> presets) : Multithreaded(multithreaded), BackupFolderPath(std::move(backupFolderPath)), CurrentPresetIndex(currentPresetIndex), Presets(std::move(presets)) {}
+PresetsAndConfig::PresetsAndConfig() = default;
 
 /*ConfigManager*/
-PresetsAndConfig ConfigManager::defaultPresetsAndConfig = PresetsAndConfig(true, 0, "", QList<Preset>());
+PresetsAndConfig ConfigManager::defaultPresetsAndConfig = PresetsAndConfig();
 QString ConfigManager::PresetsAndConfigFileName = "Backup_Utility.conf";
 QFileInfo ConfigManager::PresetsAndConfigFile;
 PresetsAndConfig ConfigManager::presetsAndConfig;
 bool ConfigManager::fileLoaded = false;
+
+void ConfigManager::errorLoadingConfig() {
+    auto result = Utility::showWarningWithButtons(nullptr, QObject::tr("Error"), QObject::tr("Could not load configuration file, load default settings and continue?"));
+    if (result != QMessageBox::Yes)
+        exit(1);
+    presetsAndConfig = defaultPresetsAndConfig;
+}
 
 void ConfigManager::Initialize() {
     PresetsAndConfigFile = QFileInfo(QStandardPaths::writableLocation(QStandardPaths::StandardLocation::ConfigLocation) + QDir::separator() + ConfigManager::PresetsAndConfigFileName);
@@ -33,47 +53,36 @@ Preset &ConfigManager::CurrentPreset() {
 void ConfigManager::Load() {
     QFile file(PresetsAndConfigFile.absoluteFilePath());
     if (!file.open(QIODeviceBase::ReadOnly))
-        return;
+        return errorLoadingConfig();
     QByteArray bytes = file.readAll();
     file.close();
     QJsonParseError jsonError;
     QJsonDocument doc = QJsonDocument::fromJson(bytes, &jsonError);
-    if (jsonError.error != QJsonParseError::NoError) {
-        auto result = Utility::showWarningWithButtons(nullptr, QObject::tr("Error"), QObject::tr("Could not load configuration file, load default settings and continue?"));
-        if (result != QMessageBox::Yes)
-            exit(1);
-        presetsAndConfig = defaultPresetsAndConfig;
-        return;
-    }
-    QJsonObject jsonObj;
-    if (doc.isObject())
-        jsonObj = doc.object();
-    presetsAndConfig.Multithreaded = jsonObj.take("Multithreaded").toBool();
-    presetsAndConfig.BackupAllPresets = jsonObj.take("BackupAllPresets").toBool();
-    presetsAndConfig.BackupFolderPath = jsonObj.take("BackupFolderPath").toString();
-    presetsAndConfig.CurrentPresetIndex = jsonObj.take("CurrentPresetIndex").toInt();
-    auto arrValue = jsonObj.take("Presets").toArray();
+    if (jsonError.error != QJsonParseError::NoError || !doc.isObject())
+        return errorLoadingConfig();
+    QJsonObject jsonObj = doc.object();
+    presetsAndConfig.Multithreaded = jsonObj.take(Multithreaded).toBool(defaultPresetsAndConfig.Multithreaded);
+    presetsAndConfig.BackupAllPresets = jsonObj.take(BackupAllPresets).toBool(defaultPresetsAndConfig.BackupAllPresets);
+    presetsAndConfig.BackupFolderPath = jsonObj.take(BackupFolderPath).toString();
+    presetsAndConfig.CurrentPresetIndex = jsonObj.take(CurrentPresetIndex).toInt();
+    auto arrValue = jsonObj.take(Presets).toArray();
+    presetsAndConfig.Presets.reserve(arrValue.size());
     while (!arrValue.isEmpty()) {
         Preset preset;
-        auto presetValue = arrValue.at(0).toObject();
-        arrValue.removeAt(0);
-        preset.PresetName = presetValue.take("PresetName").toString();
-        preset.BackupNumber = presetValue.take("BackupNumber").toInteger();
-        auto filesToSaveArr = presetValue.take("FilesToSave").toArray();
-        QStringList filesToSaveList;
-        while (!filesToSaveArr.isEmpty()) {
-            filesToSaveList.push_back(std::move(filesToSaveArr.at(0).toString()));
-            filesToSaveArr.removeAt(0);
-        }
-        preset.FilesToSave = filesToSaveList;
-        auto foldersToSaveArr = presetValue.take("FoldersToSave").toArray();
-        QStringList foldersToSaveList;
-        while (!foldersToSaveArr.isEmpty()) {
-            foldersToSaveList.push_back(std::move(foldersToSaveArr.at(0).toString()));
-            foldersToSaveArr.removeAt(0);
-        }
-        preset.FoldersToSave = foldersToSaveList;
-        presetsAndConfig.Presets.push_back(std::move(preset));
+        auto presetValue = arrValue.takeAt(0).toObject();
+        preset.PresetName = presetValue.take(PresetName).toString();
+        preset.BackupNumber = presetValue.take(BackupNumber).toInteger();
+        auto filesToSaveArr = presetValue.take(FilesToSave).toArray();
+        QStringList &filesToSaveList = preset.FilesToSave;
+        filesToSaveList.reserve(filesToSaveArr.size());
+        while (!filesToSaveArr.isEmpty())
+            filesToSaveList.append(filesToSaveArr.takeAt(0).toString());
+        auto foldersToSaveArr = presetValue.take(FoldersToSave).toArray();
+        QStringList &foldersToSaveList = preset.FoldersToSave;
+        foldersToSaveList.reserve(foldersToSaveArr.size());
+        while (!foldersToSaveArr.isEmpty())
+            foldersToSaveList.append(foldersToSaveArr.takeAt(0).toString());
+        presetsAndConfig.Presets.append(std::move(preset));
     }
     fileLoaded = true;
 }
@@ -85,26 +94,26 @@ void ConfigManager::Save(int index) {
     if (!file.open(QIODeviceBase::ReadWrite | QIODeviceBase::Truncate | QIODeviceBase::Text))
         return;
     QJsonObject pacJsonObj;
-    pacJsonObj.insert("Multithreaded", presetsAndConfig.Multithreaded);
-    pacJsonObj.insert("BackupAllPresets", presetsAndConfig.BackupAllPresets);
-    pacJsonObj.insert("BackupFolderPath", presetsAndConfig.BackupFolderPath);
-    pacJsonObj.insert("CurrentPresetIndex", presetsAndConfig.CurrentPresetIndex);
+    pacJsonObj.insert(Multithreaded, presetsAndConfig.Multithreaded);
+    pacJsonObj.insert(BackupAllPresets, presetsAndConfig.BackupAllPresets);
+    pacJsonObj.insert(BackupFolderPath, presetsAndConfig.BackupFolderPath);
+    pacJsonObj.insert(CurrentPresetIndex, presetsAndConfig.CurrentPresetIndex);
     QJsonArray presetsJsonArr;
     for (int i = 0; i < presetsAndConfig.Presets.size(); i++) {
         QJsonObject presetObj;
-        presetObj.insert("BackupNumber", presetsAndConfig.Presets[i].BackupNumber);
-        presetObj.insert("PresetName", presetsAndConfig.Presets[i].PresetName);
+        presetObj.insert(BackupNumber, presetsAndConfig.Presets[i].BackupNumber);
+        presetObj.insert(PresetName, presetsAndConfig.Presets[i].PresetName);
         QJsonArray filesToSaveJsonArr;
         for (const auto &fileToSave: presetsAndConfig.Presets[i].FilesToSave)
-            filesToSaveJsonArr.push_back(fileToSave);
-        presetObj.insert("FilesToSave", filesToSaveJsonArr);
+            filesToSaveJsonArr.append(fileToSave);
+        presetObj.insert(FilesToSave, filesToSaveJsonArr);
         QJsonArray foldersToSaveJsonArr;
         for (const auto &folderToSave: presetsAndConfig.Presets[i].FoldersToSave)
-            foldersToSaveJsonArr.push_back(folderToSave);
-        presetObj.insert("FoldersToSave", foldersToSaveJsonArr);
+            foldersToSaveJsonArr.append(folderToSave);
+        presetObj.insert(FoldersToSave, foldersToSaveJsonArr);
         presetsJsonArr.insert(i, presetObj);
     }
-    pacJsonObj.insert("Presets", presetsJsonArr);
+    pacJsonObj.insert(Presets, presetsJsonArr);
     QJsonDocument doc;
     doc.setObject(pacJsonObj);
     QByteArray bytes = doc.toJson(QJsonDocument::Indented);
@@ -127,7 +136,7 @@ void ConfigManager::CheckFilesIntegrity() {
         presetsAndConfig.CurrentPresetIndex = 0;
         configChanged = true;
     }
-    if (presetsAndConfig.BackupFolderPath != "") {
+    if (!presetsAndConfig.BackupFolderPath.isEmpty()) {
         QFileInfo backupFolder(presetsAndConfig.BackupFolderPath);
         if (!backupFolder.exists() || !backupFolder.isDir()) {
             presetsAndConfig.BackupFolderPath = "";
@@ -137,7 +146,7 @@ void ConfigManager::CheckFilesIntegrity() {
     QList<int> indexOfPresetsWithInvalidName;
     for (int i = 0; i < presetsAndConfig.Presets.size(); i++) {
         if (!isFileNameValid(presetsAndConfig.Presets[i].PresetName)) {
-            indexOfPresetsWithInvalidName.push_back(i);//! Not using push_front as push_back is always constant time
+            indexOfPresetsWithInvalidName.push_back(i);
             continue;
         }
         QList<int> indexOfInvalidFiles;
@@ -163,6 +172,7 @@ void ConfigManager::CheckFilesIntegrity() {
             configChanged = true;
         }
     }
+    //todo ask before removing anything from presets (or the preset itself)
     if (!indexOfPresetsWithInvalidName.isEmpty()) {
         for (qint64 i = indexOfPresetsWithInvalidName.size() - 1; i >= 0; i--)
             presetsAndConfig.Presets.removeAt(indexOfPresetsWithInvalidName[i]);
@@ -187,7 +197,7 @@ void ConfigManager::RemovePresetAt(int index) {
 
 bool ConfigManager::isFileNameValid(const QString &name) {
 #ifdef Q_OS_WIN
-    return !(name.contains('/') || name.contains('\') || name.contains(':') || name.contains('?') || name.contains('"') || name.contains('<') || name.contains('>') || name.contains('|') || name.contains('*'));
+    return name.contains(QRegularExpression(R"(^[^<\/*?"\\>:|]+$)"));
 #else
     return !name.contains('/');
 #endif

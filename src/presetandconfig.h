@@ -21,11 +21,11 @@ struct Preset {
     QStringList FilesToSave;
     QStringList FoldersToSave;
 
-    Preset() = default;
+    Preset();
 
     explicit Preset(QString presetName);
 
-    explicit Preset(QString presetName, qint64 backupNumber, QList<QString> filesToSave, QList<QString> FoldersToSave);
+    explicit Preset(QString presetName, qint64 backupNumber, QStringList filesToSave, QStringList FoldersToSave);
 };
 
 struct PresetsAndConfig {
@@ -35,15 +35,16 @@ struct PresetsAndConfig {
     qint64 CurrentPresetIndex = 0;
     QList<Preset> Presets;
 
-    PresetsAndConfig() = default;
-
-    PresetsAndConfig(bool multithreaded, int CurrentPresetIndex, QString backupFolderPath, QList<Preset> presets);
+    PresetsAndConfig();
 };
 
 class ConfigManager {
     static PresetsAndConfig defaultPresetsAndConfig;
     static QString PresetsAndConfigFileName;
     static QFileInfo PresetsAndConfigFile;
+
+    static void errorLoadingConfig();
+
 public:
     static PresetsAndConfig presetsAndConfig;
 
@@ -67,7 +68,7 @@ public:
 
     static void RemovePresetAt(int index);
 
-    static bool isFileNameValid(const QString& name);
+    static bool isFileNameValid(const QString &name);
 
     static bool isThereItemsToSave();
 

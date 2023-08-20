@@ -126,7 +126,7 @@ void MainWindow::btnNewPresetClicked() {
     InputDialog dialog(tr("New Preset"), tr("New preset name:"), this);
     if (!dialog.exec())
         return;
-    if (dialog.OutputString == "")
+    if (dialog.OutputString.isEmpty())
         return;
     if (!ConfigManager::isFileNameValid(dialog.OutputString)) {
 #ifdef Q_OS_WIN

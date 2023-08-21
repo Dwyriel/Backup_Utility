@@ -62,6 +62,8 @@ public:
 
     static void Save(int index = -1);
 
+    static void SortPresets();
+
     static void CheckFilesIntegrity();
 
     static void AddNewPreset(const QString &presetName);

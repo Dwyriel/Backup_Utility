@@ -84,6 +84,7 @@ void ConfigManager::Load() {
             foldersToSaveList.append(foldersToSaveArr.takeAt(0).toString());
         presetsAndConfig.Presets.append(std::move(preset));
     }
+    SortPresets();
     fileLoaded = true;
 }
 
@@ -120,6 +121,16 @@ void ConfigManager::Save(int index) {
     QTextStream outStream(&file);
     outStream << bytes;
     file.close();
+}
+
+void ConfigManager::SortPresets() {
+    std::sort(presetsAndConfig.Presets.begin(), presetsAndConfig.Presets.end(), [](const Preset &p1, const Preset &p2) {
+        QString stringP1 = p1.PresetName.toLower(), stringP2 = p2.PresetName.toLower();
+        auto stringCompare = stringP1.compare(stringP2);
+        if (stringCompare != 0)
+            return stringCompare < 0;
+        return p1.PresetName[0].isUpper();
+    });
 }
 
 void ConfigManager::CheckFilesIntegrity() {
@@ -183,16 +194,20 @@ void ConfigManager::CheckFilesIntegrity() {
 }
 
 void ConfigManager::AddNewPreset(const QString &presetName) {
-    presetsAndConfig.Presets.push_back(Preset(presetName));
-    presetsAndConfig.CurrentPresetIndex = presetsAndConfig.Presets.size() - 1;
+    presetsAndConfig.Presets.append(Preset(presetName));
+    SortPresets();
+    for (int i = 0; i < presetsAndConfig.Presets.size(); ++i)
+        if (presetsAndConfig.Presets[i].PresetName == presetName) {
+            presetsAndConfig.CurrentPresetIndex = i;
+            break;
+        }
 }
 
 void ConfigManager::RemovePresetAt(int index) {
     if (presetsAndConfig.Presets.isEmpty())
         return;
-    presetsAndConfig.CurrentPresetIndex = index;
-    presetsAndConfig.Presets.removeAt(presetsAndConfig.CurrentPresetIndex);
-    presetsAndConfig.CurrentPresetIndex = (presetsAndConfig.CurrentPresetIndex >= presetsAndConfig.Presets.size()) ? (presetsAndConfig.Presets.size() - 1) : presetsAndConfig.CurrentPresetIndex;
+    presetsAndConfig.Presets.removeAt(index);
+    presetsAndConfig.CurrentPresetIndex = (index >= presetsAndConfig.Presets.size()) ? (presetsAndConfig.Presets.size() - 1) : index;
 }
 
 bool ConfigManager::isFileNameValid(const QString &name) {

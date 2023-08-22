@@ -125,11 +125,19 @@ void ConfigManager::Save(int index) {
 
 void ConfigManager::SortPresets() {
     std::sort(presetsAndConfig.Presets.begin(), presetsAndConfig.Presets.end(), [](const Preset &p1, const Preset &p2) {
-        QString stringP1 = p1.PresetName.toLower(), stringP2 = p2.PresetName.toLower();
-        auto stringCompare = stringP1.compare(stringP2);
-        if (stringCompare != 0)
-            return stringCompare < 0;
-        return p1.PresetName[0].isUpper();
+        auto QStringCompareUppercaseFirst = [](const QString &str1, const QString &str2) {
+            const auto smallestSize = std::min(str1.size(), str2.size());
+            for (qsizetype i = 0; i < smallestSize; ++i) {
+                if (str1[i] == str2[i])
+                    continue;
+                QChar char1 = str1[i].toLower(), char2 = str2[i].toLower();
+                if (char1 == char2)
+                    return str1[i] < str2[i];
+                return char1 < char2;
+            }
+            return str1.size() < str2.size();
+        };
+        return QStringCompareUppercaseFirst(p1.PresetName, p2.PresetName);
     });
 }
 
